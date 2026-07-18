@@ -207,7 +207,7 @@
       border-radius: 24px;
       padding: 3rem;
       width: 100%;
-      max-width: 600px;
+      max-width: 540px;
       box-shadow: 0 20px 40px rgba(3, 0, 30, 0.5);
       animation: floatUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       position: relative;
@@ -248,7 +248,7 @@
       color: var(--text-secondary-light);
     }
 
-    /* Double Input Rows */
+    /* Single and Dual Input Row Configurations */
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -305,26 +305,7 @@
       box-shadow: 0 0 0 4px rgba(115, 110, 254, 0.15);
     }
 
-    .input-feedback {
-      font-size: 0.75rem;
-      margin-top: -0.25rem;
-      display: none;
-    }
-    .input-feedback.error {
-      color: var(--accent-tertiary);
-      display: block;
-    }
-    .input-feedback.success {
-      color: var(--success-color);
-      display: block;
-    }
-
-    /* Country Dropdown Custom Indicator */
-    select.input-field {
-      cursor: pointer;
-    }
-
-    /* Buttons & Custom styled checkboxes */
+    /* Checkbox & Button Configuration */
     .checkbox-container {
       display: flex;
       align-items: flex-start;
@@ -446,17 +427,10 @@
       <div class="error-banner" id="error-message">Error placeholder</div>
 
       <form id="register-form">
-        <!-- Full Name and Username -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="reg-name" id="lbl-name">Full Name</label>
-            <input class="input-field" type="text" id="reg-name" required placeholder="John Doe">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-username" id="lbl-username">Username</label>
-            <input class="input-field" type="text" id="reg-username" required placeholder="john_doe99">
-            <span class="input-feedback" id="username-feedback">Feedback message</span>
-          </div>
+        <!-- Full Name input field -->
+        <div class="form-group">
+          <label class="form-label" for="reg-name" id="lbl-name">Full Name</label>
+          <input class="input-field" type="text" id="reg-name" required placeholder="Rafsan">
         </div>
 
         <!-- Email Address -->
@@ -547,7 +521,6 @@
         registerTitle: "Create Account",
         registerSubtitle: "Join StoryVerse to publish creations and earn monetization benefits.",
         lblName: "Full Name",
-        lblUsername: "Username",
         lblEmail: "Email Address",
         lblPassword: "Password",
         lblConfirm: "Confirm Password",
@@ -562,9 +535,6 @@
         optCountry: "Select Country",
         errPassMismatch: "Passwords do not match.",
         errPassLength: "Password must be at least 6 characters.",
-        errInvalidUsername: "Username rules: 4-20 chars, a-z, A-Z, 0-9, and underscore (_) only.",
-        errUserExists: "Username is already taken.",
-        errUserAvailable: "Username is available!",
         errEmailInUse: "This email address is already registered.",
         errWeakPassword: "The password is too weak.",
         errNetwork: "Network error occurred. Check internet connection.",
@@ -574,7 +544,6 @@
         registerTitle: "অ্যাকাউন্ট তৈরি করুন",
         registerSubtitle: "স্টোরিভার্সে যোগ দিয়ে গল্প প্রকাশ করুন এবং আর্থিক সুবিধা অর্জন করুন।",
         lblName: "পূর্ণ নাম",
-        lblUsername: "ইউজারনেম",
         lblEmail: "ইমেল ঠিকানা",
         lblPassword: "পাসওয়ার্ড",
         lblConfirm: "পাসওয়ার্ড নিশ্চিত করুন",
@@ -589,9 +558,6 @@
         optCountry: "দেশ নির্বাচন করুন",
         errPassMismatch: "পাসওয়ার্ড দুটি মেলেনি।",
         errPassLength: "পাসওয়ার্ডটি অবশ্যই কমপক্ষে ৬ অক্ষরের হতে হবে।",
-        errInvalidUsername: "ইউজারনেম ৪-২০ অক্ষর, a-z, A-Z, ০-৯ এবং কেবল আন্ডারস্কোর (_) সমর্থন করে।",
-        errUserExists: "এই ইউজারনেমটি ইতিমধ্যে ব্যবহৃত হয়েছে।",
-        errUserAvailable: "ইউজারনেমটি ব্যবহারের জন্য উপলব্ধ!",
         errEmailInUse: "এই ইমেল ঠিকানা দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট নিবন্ধিত আছে।",
         errWeakPassword: "পাসওয়ার্ডটি খুব দুর্বল।",
         errNetwork: "নেটওয়ার্ক ত্রুটি ঘটেছে। আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।",
@@ -607,12 +573,6 @@
     const langBtn = document.getElementById("btn-lang");
     const registerForm = document.getElementById("register-form");
     const errorBanner = document.getElementById("error-message");
-    
-    const usernameInput = document.getElementById("reg-username");
-    const usernameFeedback = document.getElementById("username-feedback");
-
-    let isUsernameValid = false;
-    let usernameTimeout = null;
 
     applyTheme(currentTheme);
     applyLanguage(currentLang);
@@ -652,7 +612,6 @@
       document.getElementById("txt-register-title").textContent = data.registerTitle;
       document.getElementById("txt-register-subtitle").textContent = data.registerSubtitle;
       document.getElementById("lbl-name").textContent = data.lblName;
-      document.getElementById("lbl-username").textContent = data.lblUsername;
       document.getElementById("lbl-email").textContent = data.lblEmail;
       document.getElementById("lbl-password").textContent = data.lblPassword;
       document.getElementById("lbl-confirm").textContent = data.lblConfirm;
@@ -668,43 +627,25 @@
       localStorage.setItem("lang", lang);
     }
 
-    // Username Realtime Verification
-    usernameInput.addEventListener("input", () => {
-      clearTimeout(usernameTimeout);
-      const username = usernameInput.value.trim();
-      usernameFeedback.className = "input-feedback";
-      usernameFeedback.style.display = "none";
-      isUsernameValid = false;
-
-      if (!username) return;
-
-      const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
-      if (!usernameRegex.test(username)) {
-        usernameFeedback.textContent = translations[currentLang].errInvalidUsername;
-        usernameFeedback.classList.add("error");
-        return;
+    // Helper function to auto-generate unique username based on the input Full Name
+    function generateSystemUsername(fullName) {
+      // Convert to lowercase, replace spaces with underscores, and strip special characters
+      let base = fullName.toLowerCase()
+                         .replace(/\s+/g, '_')
+                         .replace(/[^a-z0-9_]/g, '');
+      
+      // Ensure there's a fallback base if username characters are entirely non-alphanumeric
+      if (!base || base.length < 3) {
+        base = "user";
       }
-
-      usernameTimeout = setTimeout(async () => {
-        try {
-          const usersRef = ref(db, "users");
-          const usernameQuery = query(usersRef, orderByChild("username"), equalTo(username));
-          const snapshot = await get(usernameQuery);
-
-          if (snapshot.exists()) {
-            usernameFeedback.textContent = translations[currentLang].errUserExists;
-            usernameFeedback.classList.add("error");
-            isUsernameValid = false;
-          } else {
-            usernameFeedback.textContent = translations[currentLang].errUserAvailable;
-            usernameFeedback.classList.add("success");
-            isUsernameValid = true;
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }, 500);
-    });
+      
+      // Truncate to match DB validation safety criteria limit
+      base = base.substring(0, 14);
+      
+      // Append random 4-digit numeric string to guarantee uniqueness
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      return `${base}_${randomNum}`;
+    }
 
     // Form Submit Event Handlers
     registerForm.addEventListener("submit", async (e) => {
@@ -712,7 +653,6 @@
       errorBanner.style.display = "none";
 
       const name = document.getElementById("reg-name").value.trim();
-      const username = usernameInput.value.trim();
       const email = document.getElementById("reg-email").value.trim();
       const password = document.getElementById("reg-password").value;
       const confirmPassword = document.getElementById("reg-confirm").value;
@@ -720,12 +660,6 @@
       const dob = document.getElementById("reg-dob").value;
       const referral = document.getElementById("reg-referral").value.trim();
       const submitBtn = document.getElementById("btn-submit");
-
-      if (!isUsernameValid) {
-        errorBanner.textContent = translations[currentLang].errInvalidUsername;
-        errorBanner.style.display = "block";
-        return;
-      }
 
       if (password.length < 6) {
         errorBanner.textContent = translations[currentLang].errPassLength;
@@ -743,6 +677,9 @@
       submitBtn.textContent = translations[currentLang].btnLoading;
 
       try {
+        // Automatically generate a unique username from Full Name input value
+        const username = generateSystemUsername(name);
+
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
