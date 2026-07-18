@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StoryVerse - Register</title>
+  
+  <!-- Google Fonts for English and Bangla Support -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Theme Variables */
+    :root {
+      --bg-gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
+      --bg-gradient-light: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f1f5f9 100%);
+      
+      --glass-bg-dark: rgba(255, 255, 255, 0.03);
+      --glass-bg-light: rgba(15, 23, 42, 0.02);
+      
+      --glass-border-dark: rgba(255, 255, 255, 0.08);
+      --glass-border-light: rgba(15, 23, 42, 0.08);
+      
+      --text-primary-dark: #f8fafc;
+      --text-primary-light: #0f172a;
+      
+      --text-secondary-dark: #94a3b8;
+      --text-secondary-light: #475569;
+      
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-color: #f43f5e;
+      --success-color: #10b981;
+      
+      --font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    body {
+      background: var(--bg-gradient-dark);
+      color: var(--text-primary-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    body.light-mode {
+      background: var(--bg-gradient-light);
+      color: var(--text-primary-light);
+    }
+
+    /* Loading Spinner */
+    .global-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    body.light-mode .global-loader {
+      background: #f8fafc;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(99, 102, 241, 0.2);
+      border-top: 5px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: var(--glass-bg-dark);
+      border-bottom: 1px solid var(--glass-border-dark);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    body.light-mode .navbar {
+      background: var(--glass-bg-light);
+      border-bottom: 1px solid var(--glass-border-light);
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+      background: linear-gradient(to right, #6366f1, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .control-icon {
+      background: var(--glass-bg-dark);
+      border: 1px solid var(--glass-border-dark);
+      color: var(--text-primary-dark);
+      padding: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    body.light-mode .control-icon {
+      background: var(--glass-bg-light);
+      border-color: var(--glass-border-light);
+      color: var(--text-primary-light);
+    }
+
+    /* Container alignment */
+    .auth-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+
+    .auth-card {
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--glass-border-dark);
+      border-radius: 16px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 580px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      animation: floatUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    body.light-mode .auth-card {
+      background: rgba(15, 23, 42, 0.01);
+      border-color: var(--glass-border-light);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+    }
+
+    @keyframes floatUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .auth-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .auth-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary-dark);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    body.light-mode .auth-subtitle {
+      color: var(--text-secondary-light);
+    }
+
+    /* Dual input row layouts on Desktop */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 576px) {
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--glass-border-dark);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary-dark);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    body.light-mode .input-field {
+      border-color: var(--glass-border-light);
+      background: rgba(0, 0, 0, 0.02);
+      color: var(--text-primary-light);
+    }
+
+    .input-field:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .input-feedback {
+      font-size: 0.75rem;
+      margin-top: -0.25rem;
+      display: none;
+    }
+    .input-feedback.error {
+      color: var(--accent-color);
+      display: block;
+    }
+    .input-feedback.success {
+      color: var(--success-color);
+      display: block;
+    }
+
+    /* Selector */
+    select.input-field {
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    /* Buttons & Checkboxes */
+    .checkbox-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin: 1rem 0 1.5rem 0;
+    }
+
+    .checkbox-input {
+      accent-color: var(--primary-color);
+      margin-top: 0.2rem;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    .btn-primary {
+      background: var(--primary-color);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .error-banner {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: var(--accent-color);
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+
+    .switch-auth-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary-dark);
+    }
+    body.light-mode .switch-auth-link {
+      color: var(--text-secondary-light);
+    }
+    .switch-auth-link a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .switch-auth-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Animation Overlay -->
+  <div class="global-loader" id="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <header class="navbar">
+    <a href="index.html" class="nav-logo">StoryVerse</a>
+    <div class="nav-actions">
+      <button class="control-icon" id="btn-lang" title="Switch Language">EN</button>
+      <button class="control-icon" id="btn-theme" title="Toggle Theme">🌙</button>
+    </div>
+  </header>
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <h2 class="auth-title" id="txt-register-title">Create Account</h2>
+      <p class="auth-subtitle" id="txt-register-subtitle">Join StoryVerse to publish creations and earn monetization benefits.</p>
+      
+      <!-- Error Feedback Display Area -->
+      <div class="error-banner" id="error-message">Error placeholder</div>
+
+      <form id="register-form">
+        <!-- Full Name and Username -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="reg-name" id="lbl-name">Full Name</label>
+            <input class="input-field" type="text" id="reg-name" required placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-username" id="lbl-username">Username</label>
+            <input class="input-field" type="text" id="reg-username" required placeholder="john_doe99">
+            <span class="input-feedback" id="username-feedback">Feedback message</span>
+          </div>
+        </div>
+
+        <!-- Email Address -->
+        <div class="form-group">
+          <label class="form-label" for="reg-email" id="lbl-email">Email Address</label>
+          <input class="input-field" type="email" id="reg-email" required placeholder="name@domain.com">
+        </div>
+
+        <!-- Passwords -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="reg-password" id="lbl-password">Password</label>
+            <input class="input-field" type="password" id="reg-password" required placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-confirm" id="lbl-confirm">Confirm Password</label>
+            <input class="input-field" type="password" id="reg-confirm" required placeholder="••••••••">
+          </div>
+        </div>
+
+        <!-- Country and Date of Birth -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="reg-country" id="lbl-country">Country</label>
+            <select class="input-field" id="reg-country" required>
+              <option value="" disabled selected id="opt-country-placeholder">Select Country</option>
+              <option value="Bangladesh">Bangladesh</option>
+              <option value="United States">United States</option>
+              <option value="India">India</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Canada">Canada</option>
+              <option value="Australia">Australia</option>
+              <option value="Singapore">Singapore</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-dob" id="lbl-dob">Date Of Birth</label>
+            <input class="input-field" type="date" id="reg-dob" required>
+          </div>
+        </div>
+
+        <!-- Referral (Optional) -->
+        <div class="form-group">
+          <label class="form-label" for="reg-referral" id="lbl-referral">Referral Code (Optional)</label>
+          <input class="input-field" type="text" id="reg-referral" placeholder="REF1234">
+        </div>
+
+        <!-- Terms Acceptance -->
+        <label class="checkbox-container">
+          <input type="checkbox" class="checkbox-input" id="accept-terms" required>
+          <span id="lbl-terms">I accept the Terms & Conditions and Privacy Policy guidelines.</span>
+        </label>
+
+        <button type="submit" class="btn btn-primary" id="btn-submit">Register</button>
+      </form>
+
+      <div class="switch-auth-link">
+        <span id="txt-have-account">Already have an account?</span>
+        <a href="login.html" id="lnk-login">Login</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Script modules -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, set, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Firebase config placeholder
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const translations = {
+      EN: {
+        registerTitle: "Create Account",
+        registerSubtitle: "Join StoryVerse to publish creations and earn monetization benefits.",
+        lblName: "Full Name",
+        lblUsername: "Username",
+        lblEmail: "Email Address",
+        lblPassword: "Password",
+        lblConfirm: "Confirm Password",
+        lblCountry: "Country",
+        lblDob: "Date Of Birth",
+        lblReferral: "Referral Code (Optional)",
+        lblTerms: "I accept the Terms & Conditions and Privacy Policy guidelines.",
+        btnSubmit: "Register",
+        btnLoading: "Registering account...",
+        txtHaveAccount: "Already have an account? ",
+        lnkLogin: "Login",
+        optCountry: "Select Country",
+        errPassMismatch: "Passwords do not match.",
+        errPassLength: "Password must be at least 6 characters.",
+        errInvalidUsername: "Username rules: 4-20 chars, a-z, A-Z, 0-9, and underscore (_) only.",
+        errUserExists: "Username is already taken.",
+        errUserAvailable: "Username is available!",
+        errEmailInUse: "This email address is already registered.",
+        errWeakPassword: "The password is too weak.",
+        errNetwork: "Network error occurred. Check internet connection.",
+        errGeneric: "An unexpected error occurred. Please try again."
+      },
+      BN: {
+        registerTitle: "অ্যাকাউন্ট তৈরি করুন",
+        registerSubtitle: "স্টোরিভার্সে যোগ দিয়ে গল্প প্রকাশ করুন এবং আর্থিক সুবিধা অর্জন করুন।",
+        lblName: "পূর্ণ নাম",
+        lblUsername: "ইউজারনেম",
+        lblEmail: "ইমেল ঠিকানা",
+        lblPassword: "পাসওয়ার্ড",
+        lblConfirm: "পাসওয়ার্ড নিশ্চিত করুন",
+        lblCountry: "দেশ",
+        lblDob: "জন্ম তারিখ",
+        lblReferral: "রেফারাল কোড (ঐচ্ছিক)",
+        lblTerms: "আমি সকল নিয়ম-কানুন এবং গোপনীয়তা নীতির শর্তাবলী মেনে নিচ্ছি।",
+        btnSubmit: "নিবন্ধন করুন",
+        btnLoading: "নিবন্ধন করা হচ্ছে...",
+        txtHaveAccount: "ইতিমধ্যে একটি অ্যাকাউন্ট আছে? ",
+        lnkLogin: "লগইন",
+        optCountry: "দেশ নির্বাচন করুন",
+        errPassMismatch: "পাসওয়ার্ড দুটি মেলেনি।",
+        errPassLength: "পাসওয়ার্ডটি অবশ্যই কমপক্ষে ৬ অক্ষরের হতে হবে।",
+        errInvalidUsername: "ইউজারনেম ৪-২০ অক্ষর, a-z, A-Z, ০-৯ এবং কেবল আন্ডারস্কোর (_) সমর্থন করে।",
+        errUserExists: "এই ইউজারনেমটি ইতিমধ্যে ব্যবহৃত হয়েছে।",
+        errUserAvailable: "ইউজারনেমটি ব্যবহারের জন্য উপলব্ধ!",
+        errEmailInUse: "এই ইমেল ঠিকানা দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট নিবন্ধিত আছে।",
+        errWeakPassword: "পাসওয়ার্ডটি খুব দুর্বল।",
+        errNetwork: "নেটওয়ার্ক ত্রুটি ঘটেছে। আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।",
+        errGeneric: "একটি অপ্রত্যাশিত সমস্যা ঘটেছে। আবার চেষ্টা করুন।"
+      }
+    };
+
+    let currentLang = localStorage.getItem("lang") || "EN";
+    let currentTheme = localStorage.getItem("theme") || "dark";
+
+    const loader = document.getElementById("loader");
+    const themeBtn = document.getElementById("btn-theme");
+    const langBtn = document.getElementById("btn-lang");
+    const registerForm = document.getElementById("register-form");
+    const errorBanner = document.getElementById("error-message");
+    
+    const usernameInput = document.getElementById("reg-username");
+    const usernameFeedback = document.getElementById("username-feedback");
+
+    let isUsernameValid = false;
+    let usernameTimeout = null;
+
+    applyTheme(currentTheme);
+    applyLanguage(currentLang);
+
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        loader.style.opacity = "0";
+        setTimeout(() => loader.style.display = "none", 500);
+      }, 300);
+    });
+
+    themeBtn.addEventListener("click", () => {
+      currentTheme = currentTheme === "dark" ? "light" : "dark";
+      applyTheme(currentTheme);
+    });
+
+    function applyTheme(theme) {
+      if (theme === "light") {
+        document.body.classList.add("light-mode");
+        themeBtn.textContent = "☀️";
+      } else {
+        document.body.classList.remove("light-mode");
+        themeBtn.textContent = "🌙";
+      }
+      localStorage.setItem("theme", theme);
+    }
+
+    langBtn.addEventListener("click", () => {
+      currentLang = currentLang === "EN" ? "BN" : "EN";
+      applyLanguage(currentLang);
+    });
+
+    function applyLanguage(lang) {
+      const data = translations[lang];
+      langBtn.textContent = lang;
+
+      document.getElementById("txt-register-title").textContent = data.registerTitle;
+      document.getElementById("txt-register-subtitle").textContent = data.registerSubtitle;
+      document.getElementById("lbl-name").textContent = data.lblName;
+      document.getElementById("lbl-username").textContent = data.lblUsername;
+      document.getElementById("lbl-email").textContent = data.lblEmail;
+      document.getElementById("lbl-password").textContent = data.lblPassword;
+      document.getElementById("lbl-confirm").textContent = data.lblConfirm;
+      document.getElementById("lbl-country").textContent = data.lblCountry;
+      document.getElementById("lbl-dob").textContent = data.lblDob;
+      document.getElementById("lbl-referral").textContent = data.lblReferral;
+      document.getElementById("lbl-terms").textContent = data.lblTerms;
+      document.getElementById("btn-submit").textContent = data.btnSubmit;
+      document.getElementById("txt-have-account").textContent = data.txtHaveAccount;
+      document.getElementById("lnk-login").textContent = data.lnkLogin;
+      document.getElementById("opt-country-placeholder").textContent = data.optCountry;
+
+      localStorage.setItem("lang", lang);
+    }
+
+    // Username Realtime Verification
+    usernameInput.addEventListener("input", () => {
+      clearTimeout(usernameTimeout);
+      const username = usernameInput.value.trim();
+      usernameFeedback.className = "input-feedback";
+      usernameFeedback.style.display = "none";
+      isUsernameValid = false;
+
+      if (!username) return;
+
+      // Regular expression matching Rules: 4-20 length, A-Z, a-z, 0-9, underscore
+      const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
+      if (!usernameRegex.test(username)) {
+        usernameFeedback.textContent = translations[currentLang].errInvalidUsername;
+        usernameFeedback.classList.add("error");
+        return;
+      }
+
+      // Debounce check for efficiency
+      usernameTimeout = setTimeout(async () => {
+        try {
+          const usersRef = ref(db, "users");
+          const usernameQuery = query(usersRef, orderByChild("username"), equalTo(username));
+          const snapshot = await get(usernameQuery);
+
+          if (snapshot.exists()) {
+            usernameFeedback.textContent = translations[currentLang].errUserExists;
+            usernameFeedback.classList.add("error");
+            isUsernameValid = false;
+          } else {
+            usernameFeedback.textContent = translations[currentLang].errUserAvailable;
+            usernameFeedback.classList.add("success");
+            isUsernameValid = true;
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }, 500);
+    });
+
+    // Form Submit Event Handlers
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBanner.style.display = "none";
+
+      const name = document.getElementById("reg-name").value.trim();
+      const username = usernameInput.value.trim();
+      const email = document.getElementById("reg-email").value.trim();
+      const password = document.getElementById("reg-password").value;
+      const confirmPassword = document.getElementById("reg-confirm").value;
+      const country = document.getElementById("reg-country").value;
+      const dob = document.getElementById("reg-dob").value;
+      const referral = document.getElementById("reg-referral").value.trim();
+      const submitBtn = document.getElementById("btn-submit");
+
+      // Verify username validity status
+      if (!isUsernameValid) {
+        errorBanner.textContent = translations[currentLang].errInvalidUsername;
+        errorBanner.style.display = "block";
+        return;
+      }
+
+      // Password checks
+      if (password.length < 6) {
+        errorBanner.textContent = translations[currentLang].errPassLength;
+        errorBanner.style.display = "block";
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        errorBanner.textContent = translations[currentLang].errPassMismatch;
+        errorBanner.style.display = "block";
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = translations[currentLang].btnLoading;
+
+      try {
+        // Create Firebase Authentication Account
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // User Record Profile Schema creation in RTDB
+        const userProfileRef = ref(db, `users/${user.uid}`);
+        await set(userProfileRef, {
+          name: name,
+          username: username,
+          email: email,
+          country: country,
+          dob: dob,
+          referralCode: referral || "",
+          role: "user",
+          status: "active",
+          writer: false,
+          writerActivated: false,
+          level: 1,
+          xp: 0,
+          followers: 0,
+          following: 0,
+          stories: 0,
+          chapters: 0,
+          views: 0,
+          likes: 0,
+          comments: 0,
+          walletBDT: 0,
+          walletUSD: 0,
+          walletUSDT: 0,
+          badge: "New Writer",
+          createdAt: Date.now(),
+          lastLogin: Date.now(),
+          theme: "Auto",
+          language: currentLang === "EN" ? "English" : "Bangla"
+        });
+
+        // Initialize User balance structures explicitly inside wallets/ structure
+        const walletRef = ref(db, `wallets/${user.uid}`);
+        await set(walletRef, {
+          bdt: 0,
+          usd: 0,
+          usdt: 0,
+          pending: 0,
+          earned: 0,
+          spent: 0
+        });
+
+        // Redirect on successful record creation
+        window.location.href = "home.html";
+
+      } catch (error) {
+        console.error("Registration error details:", error);
+        displayRegisterError(error.code);
+        submitBtn.disabled = false;
+        submitBtn.textContent = translations[currentLang].btnSubmit;
+      }
+    });
+
+    function displayRegisterError(code) {
+      const data = translations[currentLang];
+      let displayMessage = data.errGeneric;
+
+      switch (code) {
+        case "auth/email-already-in-use":
+          displayMessage = data.errEmailInUse;
+          break;
+        case "auth/weak-password":
+          displayMessage = data.errWeakPassword;
+          break;
+        case "auth/network-request-failed":
+          displayMessage = data.errNetwork;
+          break;
+      }
+
+      errorBanner.textContent = displayMessage;
+      errorBanner.style.display = "block";
+    }
+  </script>
+</body>
+</html>
