@@ -5,18 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StoryVerse - Read, Write and Earn Stories</title>
   
-  <!-- Google Fonts for English and Bangla Support -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
-    /* Theme Variables */
+    /* Premium Visual Variables */
     :root {
-      --bg-gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
-      --bg-gradient-light: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f1f5f9 100%);
+      --bg-dark: #03001e;
+      --bg-light: #f5f7fb;
       
-      --glass-bg-dark: rgba(255, 255, 255, 0.03);
+      --accent-primary: #736efe;
+      --accent-secondary: #5f85ff;
+      --accent-tertiary: #ec4899;
+      --card-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
+      
+      --glass-bg-dark: rgba(255, 255, 255, 0.02);
       --glass-bg-light: rgba(15, 23, 42, 0.02);
       
       --glass-border-dark: rgba(255, 255, 255, 0.08);
@@ -28,348 +33,505 @@
       --text-secondary-dark: #94a3b8;
       --text-secondary-light: #475569;
       
-      --primary-color: #6366f1;
-      --primary-hover: #4f46e5;
-      --accent-color: #f43f5e;
-      --success-color: #10b981;
-      
-      --font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+      --font-classic: 'Playfair Display', serif;
+      --font-modern: 'Plus Jakarta Sans', sans-serif;
+      --font-bangla: 'Hind Siliguri', sans-serif;
     }
 
-    /* Reset & Base Styles */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: var(--font-family);
-      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+      font-family: var(--font-modern);
+      transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                  border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                  color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    /* Ambient animated mesh background */
     body {
-      background: var(--bg-gradient-dark);
+      background-color: var(--bg-dark);
       color: var(--text-primary-dark);
       min-height: 100vh;
       overflow-x: hidden;
-      line-height: 1.6;
+      line-height: 1.7;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(115, 110, 254, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: -1;
+      animation: drift 15s ease infinite alternate;
     }
 
     body.light-mode {
-      background: var(--bg-gradient-light);
+      background-color: var(--bg-light);
       color: var(--text-primary-light);
     }
 
-    /* Core Layout Wrapper */
-    .app-container {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+    body.light-mode::before {
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(115, 110, 254, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.04) 0%, transparent 45%);
     }
 
-    /* Global Loader */
+    @keyframes drift {
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.1) translate(2%, 2%); }
+    }
+
+    /* Global Loader screen with premium fade */
     .global-loader {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #0f172a;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #03001e;
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 9999;
-      transition: opacity 0.5s ease, transform 0.5s ease;
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
     body.light-mode .global-loader {
-      background: #f8fafc;
+      background: #f5f7fb;
     }
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid rgba(99, 102, 241, 0.2);
-      border-top: 5px solid var(--primary-color);
+    
+    .spinner-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .spinner-classic {
+      position: relative;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      border: 2px solid transparent;
+      border-top-color: var(--accent-primary);
+      animation: spinClassic 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
     }
-    @keyframes spin {
+
+    .spinner-classic::before {
+      content: '';
+      position: absolute;
+      top: 4px; left: 4px; right: 4px; bottom: 4px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--accent-tertiary);
+      animation: spinClassic 1.8s linear infinite reverse;
+    }
+
+    @keyframes spinClassic {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
 
-    /* Navbar styling */
+    .loader-logo {
+      font-family: var(--font-classic);
+      font-size: 1.5rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: linear-gradient(to right, #736efe, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Sticky Blur Navbar */
     .navbar {
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      background: var(--glass-bg-dark);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      background: rgba(3, 0, 30, 0.6);
       border-bottom: 1px solid var(--glass-border-dark);
       position: sticky;
       top: 0;
       z-index: 100;
-      padding: 1rem 2rem;
+      padding: 1.25rem 3rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
     }
     body.light-mode .navbar {
-      background: var(--glass-bg-light);
+      background: rgba(245, 247, 251, 0.6);
       border-bottom: 1px solid var(--glass-border-light);
     }
 
     .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1.5rem;
+      font-family: var(--font-classic);
+      font-size: 1.75rem;
       font-weight: 700;
-      color: var(--primary-color);
+      letter-spacing: 0.05em;
       text-decoration: none;
-      background: linear-gradient(to right, #6366f1, #ec4899);
+      background: linear-gradient(135deg, #736efe 0%, #ec4899 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      position: relative;
+    }
+
+    .nav-logo::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0; width: 0; height: 1.5px;
+      background: linear-gradient(to right, #736efe, #ec4899);
+      transition: width 0.3s ease;
+    }
+    .nav-logo:hover::after {
+      width: 100%;
     }
 
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.25rem;
     }
 
-    /* Generic buttons */
+    /* Premium Button Styles */
     .btn {
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-weight: 500;
+      padding: 0.75rem 1.5rem;
+      border-radius: 40px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
       cursor: pointer;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 0.6rem;
       border: none;
       outline: none;
-      font-size: 0.9rem;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      font-size: 0.85rem;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
     }
-    .btn:active {
-      transform: scale(0.97);
-    }
+    
     .btn-primary {
-      background: var(--primary-color);
-      color: white;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(115, 110, 254, 0.25);
     }
     .btn-primary:hover {
-      background: var(--primary-hover);
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(115, 110, 254, 0.4);
     }
+
     .btn-secondary {
-      background: transparent;
-      border: 1px solid var(--glass-border-dark);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: var(--text-primary-dark);
+      backdrop-filter: blur(10px);
     }
     body.light-mode .btn-secondary {
-      border-color: var(--glass-border-light);
+      background: rgba(15, 23, 42, 0.02);
+      border: 1px solid rgba(15, 23, 42, 0.08);
       color: var(--text-primary-light);
     }
     .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
     }
     body.light-mode .btn-secondary:hover {
-      background: rgba(0, 0, 0, 0.03);
+      background: rgba(0, 0, 0, 0.05);
     }
 
-    /* Controls for Theme & Lang */
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.6s ease;
+    }
+    .btn:hover::after {
+      left: 100%;
+    }
+
+    /* Controls for Switch togglers */
     .control-icon {
-      background: var(--glass-bg-dark);
-      border: 1px solid var(--glass-border-dark);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       color: var(--text-primary-dark);
-      padding: 0.5rem;
-      border-radius: 8px;
+      padding: 0.65rem;
+      border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1rem;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     body.light-mode .control-icon {
-      background: var(--glass-bg-light);
-      border-color: var(--glass-border-light);
+      background: rgba(15, 23, 42, 0.02);
+      border-color: rgba(15, 23, 42, 0.08);
       color: var(--text-primary-light);
     }
+    .control-icon:hover {
+      transform: scale(1.1) rotate(15deg);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
 
-    /* Hero Section */
+    /* Classic Hero Section */
     .hero {
       text-align: center;
-      padding: 6rem 2rem 4rem 2rem;
+      padding: 8rem 2rem 6rem 2rem;
       position: relative;
+      max-width: 900px;
+      margin: 0 auto;
     }
     .hero-title {
-      font-size: 3.5rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-      background: linear-gradient(to right, #ffffff, #94a3b8);
+      font-family: var(--font-classic);
+      font-size: 4rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.01em;
+      background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      animation: fadeInUp 1s ease-out;
     }
     body.light-mode .hero-title {
-      background: linear-gradient(to right, #0f172a, #475569);
+      background: linear-gradient(135deg, #03001e 30%, #4338ca 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
     .hero-tagline {
-      font-size: 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 400;
       color: var(--text-secondary-dark);
-      margin-bottom: 2.5rem;
+      margin-bottom: 3rem;
+      max-width: 650px;
+      margin-left: auto;
+      margin-right: auto;
+      animation: fadeInUp 1s ease-out 0.2s both;
     }
     body.light-mode .hero-tagline {
       color: var(--text-secondary-light);
     }
+
     .hero-ctas {
       display: flex;
       justify-content: center;
-      gap: 1rem;
+      gap: 1.25rem;
       flex-wrap: wrap;
+      animation: fadeInUp 1s ease-out 0.4s both;
     }
     .hero-ctas .btn {
-      padding: 0.9rem 1.8rem;
-      font-size: 1rem;
+      padding: 1rem 2.5rem;
+      font-size: 0.95rem;
     }
 
-    /* Features Grid */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Section Styling */
     .section-container {
       max-width: 1200px;
-      margin: 4rem auto;
-      padding: 0 1.5rem;
+      margin: 6rem auto;
+      padding: 0 2rem;
     }
     .section-title {
-      font-size: 2rem;
+      font-family: var(--font-classic);
+      font-size: 2.25rem;
       font-weight: 700;
-      margin-bottom: 2rem;
+      margin-bottom: 3rem;
       text-align: center;
       position: relative;
     }
     .section-title::after {
-      content: '';
+      content: '✦';
+      font-size: 1rem;
+      color: var(--accent-primary);
       position: absolute;
-      bottom: -8px;
+      bottom: -25px;
       left: 50%;
       transform: translateX(-50%);
-      width: 60px;
-      height: 3px;
-      background: var(--primary-color);
-      border-radius: 2px;
     }
 
+    /* Glassmorphism Feature Grid */
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
     }
+
     .card {
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      background: var(--glass-bg-dark);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
       border: 1px solid var(--glass-border-dark);
-      border-radius: 12px;
-      padding: 2rem;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-radius: 20px;
+      padding: 2.5rem;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.25rem;
+      position: relative;
+      overflow: hidden;
     }
     body.light-mode .card {
-      background: var(--glass-bg-light);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.01) 0%, rgba(15, 23, 42, 0.005) 100%);
       border-color: var(--glass-border-light);
     }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(115, 110, 254, 0.05) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .card:hover::before {
+      opacity: 1;
+    }
+
     .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      transform: translateY(-8px);
+      border-color: rgba(115, 110, 254, 0.3);
+      box-shadow: 0 15px 35px rgba(3, 0, 30, 0.5);
     }
     body.light-mode .card:hover {
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 15px 35px rgba(15, 23, 42, 0.05);
     }
+
     .card-icon {
-      font-size: 2.5rem;
-      color: var(--primary-color);
+      font-size: 2.25rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 2;
     }
     .card-title {
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       font-weight: 600;
+      position: relative;
+      z-index: 2;
     }
     .card-desc {
       color: var(--text-secondary-dark);
       font-size: 0.95rem;
+      line-height: 1.6;
+      position: relative;
+      z-index: 2;
     }
     body.light-mode .card-desc {
       color: var(--text-secondary-light);
     }
 
-    /* Content Previews */
+    /* Premium Story Card Displays */
     .preview-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.5rem;
-      margin-top: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
     }
-    
+
     .story-card {
       display: flex;
       flex-direction: column;
-      border-radius: 12px;
+      border-radius: 18px;
       overflow: hidden;
-      background: var(--glass-bg-dark);
+      background: rgba(255, 255, 255, 0.01);
       border: 1px solid var(--glass-border-dark);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
     }
     body.light-mode .story-card {
-      background: var(--glass-bg-light);
+      background: rgba(15, 23, 42, 0.01);
       border-color: var(--glass-border-light);
     }
     .story-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-6px) scale(1.01);
+      border-color: rgba(115, 110, 254, 0.3);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.3);
     }
+    body.light-mode .story-card:hover {
+      box-shadow: 0 15px 30px rgba(0,0,0,0.04);
+    }
+
     .story-cover {
-      height: 180px;
+      height: 220px;
       background-size: cover;
       background-position: center;
       position: relative;
+      transition: transform 0.5s ease;
     }
+    .story-card:hover .story-cover {
+      transform: scale(1.03);
+    }
+
     .story-lang-badge {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px);
+      top: 15px; left: 15px;
+      background: rgba(3, 0, 30, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
       color: #fff;
-      padding: 0.25rem 0.6rem;
+      padding: 0.3rem 0.8rem;
       border-radius: 20px;
       font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
     }
+
     .story-info {
-      padding: 1.25rem;
+      padding: 1.5rem;
       display: flex;
       flex-direction: column;
       flex-grow: 1;
-      gap: 0.5rem;
+      gap: 0.75rem;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.01));
     }
+
     .story-title {
-      font-size: 1.1rem;
+      font-family: var(--font-classic);
+      font-size: 1.25rem;
       font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: var(--text-primary-dark);
     }
+    body.light-mode .story-title {
+      color: var(--text-primary-light);
+    }
+
     .story-author {
       font-size: 0.85rem;
       color: var(--text-secondary-dark);
+      letter-spacing: 0.03em;
     }
     body.light-mode .story-author {
       color: var(--text-secondary-light);
     }
+
     .story-meta {
       display: flex;
       justify-content: space-between;
       font-size: 0.8rem;
       margin-top: auto;
-      padding-top: 0.5rem;
+      padding-top: 1rem;
       border-top: 1px solid var(--glass-border-dark);
       color: var(--text-secondary-dark);
     }
@@ -378,52 +540,57 @@
       color: var(--text-secondary-light);
     }
 
-    /* Skeleton Loading states */
-    .skeleton-card {
-      height: 300px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
-      background-size: 200% 100%;
-      animation: skeleton-shimmer 1.5s infinite;
-      border-radius: 12px;
-    }
-    body.light-mode .skeleton-card {
-      background: linear-gradient(90deg, rgba(0,0,0,0.03) 25%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.03) 75%);
-      background-size: 200% 100%;
-    }
-    @keyframes skeleton-shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
-    /* Top Writers */
+    /* Top Writers classic circles */
     .writer-card {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      padding: 1rem;
-      background: var(--glass-bg-dark);
+      gap: 1.25rem;
+      padding: 1.25rem;
+      background: rgba(255, 255, 255, 0.01);
       border: 1px solid var(--glass-border-dark);
-      border-radius: 12px;
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
     body.light-mode .writer-card {
-      background: var(--glass-bg-light);
+      background: rgba(15, 23, 42, 0.01);
       border-color: var(--glass-border-light);
     }
+    .writer-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(115, 110, 254, 0.2);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    body.light-mode .writer-card:hover {
+      background: rgba(0,0,0,0.01);
+    }
+
     .writer-avatar {
-      width: 50px;
-      height: 50px;
+      width: 55px;
+      height: 55px;
       border-radius: 50%;
-      background: #475569;
+      background: #334155;
       background-size: cover;
       background-position: center;
+      border: 2px solid var(--glass-border-dark);
+      transition: transform 0.4s ease;
     }
+    .writer-card:hover .writer-avatar {
+      transform: scale(1.05);
+      border-color: var(--accent-primary);
+    }
+
     .writer-details {
       display: flex;
       flex-direction: column;
+      gap: 0.25rem;
     }
     .writer-name {
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 1rem;
+      color: var(--text-primary-dark);
+    }
+    body.light-mode .writer-name {
+      color: var(--text-primary-light);
     }
     .writer-sub {
       font-size: 0.8rem;
@@ -433,54 +600,93 @@
       color: var(--text-secondary-light);
     }
 
-    /* Footer styles */
+    /* Skeleton Loading states */
+    .skeleton-card {
+      height: 340px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.01) 25%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0.01) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.6s infinite;
+      border-radius: 18px;
+      border: 1px solid var(--glass-border-dark);
+    }
+    body.light-mode .skeleton-card {
+      background: linear-gradient(90deg, rgba(0,0,0,0.01) 25%, rgba(0,0,0,0.03) 50%, rgba(0,0,0,0.01) 75%);
+      border-color: var(--glass-border-light);
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Footer styling */
     .footer {
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      background: var(--glass-bg-dark);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      background: rgba(3, 0, 30, 0.8);
       border-top: 1px solid var(--glass-border-dark);
-      padding: 3rem 2rem;
+      padding: 5rem 3rem 3rem 3rem;
       margin-top: auto;
     }
     body.light-mode .footer {
-      background: var(--glass-bg-light);
+      background: rgba(245, 247, 251, 0.8);
       border-color: var(--glass-border-light);
     }
     .footer-content {
       max-width: 1200px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 4rem;
+    }
+    @media (max-width: 768px) {
+      .footer-content {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
     }
     .footer-brand {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 1rem;
+    }
+    .footer-brand p {
+      font-size: 0.95rem;
+      color: var(--text-secondary-dark);
+      max-width: 320px;
+    }
+    body.light-mode .footer-brand p {
+      color: var(--text-secondary-light);
     }
     .footer-links {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 1rem;
+    }
+    .footer-links h4 {
+      font-family: var(--font-classic);
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
     }
     .footer-links a {
       color: var(--text-secondary-dark);
       text-decoration: none;
       font-size: 0.9rem;
-      transition: color 0.2s ease;
+      transition: color 0.3s ease, transform 0.3s ease;
+      display: inline-block;
     }
     body.light-mode .footer-links a {
       color: var(--text-secondary-light);
     }
     .footer-links a:hover {
-      color: var(--primary-color);
+      color: var(--accent-primary);
+      transform: translateX(4px);
     }
     .footer-bottom {
       text-align: center;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: var(--text-secondary-dark);
-      margin-top: 2rem;
-      padding-top: 1rem;
+      margin-top: 4rem;
+      padding-top: 2rem;
       border-top: 1px solid var(--glass-border-dark);
     }
     body.light-mode .footer-bottom {
@@ -488,48 +694,48 @@
       border-color: var(--glass-border-light);
     }
 
-    /* Responsive adjustment */
+    /* Responsive layouts */
     @media (max-width: 768px) {
       .hero-title {
-        font-size: 2.5rem;
+        font-size: 2.75rem;
       }
       .hero-tagline {
-        font-size: 1.15rem;
+        font-size: 1.05rem;
       }
       .navbar {
-        padding: 1rem;
-      }
-      .nav-logo {
-        font-size: 1.25rem;
+        padding: 1rem 1.5rem;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Loading Overlay -->
+  <!-- Loading Screen Animation -->
   <div class="global-loader" id="loader">
-    <div class="spinner"></div>
+    <div class="spinner-box">
+      <div class="spinner-classic"></div>
+      <div class="loader-logo">StoryVerse</div>
+    </div>
   </div>
 
   <div class="app-container">
-    <!-- Navbar Header -->
+    <!-- Navbar Navigation Header -->
     <header class="navbar">
       <a href="index.html" class="nav-logo">StoryVerse</a>
       <div class="nav-actions">
-        <!-- Language Select Toggle -->
-        <button class="control-icon" id="btn-lang" title="Switch Language" aria-label="Switch Language">EN</button>
-        <!-- Dark/Light Theme Toggle -->
-        <button class="control-icon" id="btn-theme" title="Toggle Theme" aria-label="Toggle Theme">🌙</button>
-        <!-- Auth Dependent Action Buttons -->
-        <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
+        <!-- Language Switch Controller -->
+        <button class="control-icon" id="btn-lang" title="Switch Language">EN</button>
+        <!-- Dark/Light Theme Controller -->
+        <button class="control-icon" id="btn-theme" title="Toggle Theme">🌙</button>
+        <!-- User Status Dependent Buttons -->
+        <div id="auth-buttons" style="display: flex; gap: 0.75rem;">
           <a href="login.html" class="btn btn-secondary" id="txt-login">Login</a>
           <a href="register.html" class="btn btn-primary" id="txt-register">Register</a>
         </div>
       </div>
     </header>
 
-    <!-- Hero Area -->
+    <!-- Classical Hero Showcase Area -->
     <section class="hero">
       <h1 class="hero-title" id="hero-title">Read, Write and Earn Stories</h1>
       <p class="hero-tagline" id="hero-desc">Discover worlds crafted by talented creators, grow your library, and earn monetization value straight to your secured wallet.</p>
@@ -539,43 +745,38 @@
       </div>
     </section>
 
-    <!-- Features Area -->
+    <!-- Highlight Features Area -->
     <section class="section-container">
       <h2 class="section-title" id="title-features">Platform Highlights</h2>
       <div class="features-grid" id="features-grid">
-        <!-- Card 1 -->
+        <!-- Highlights Cards -->
         <div class="card">
           <div class="card-icon">✍️</div>
           <h3 class="card-title" id="feat-1-title">Publish Stories</h3>
           <p class="card-desc" id="feat-1-desc">Share your stories with a passionate community of global readers.</p>
         </div>
-        <!-- Card 2 -->
         <div class="card">
-          <div class="card-icon">💰</div>
+          <div class="card-icon">👑</div>
           <h3 class="card-title" id="feat-2-title">Earn From Chapters</h3>
           <p class="card-desc" id="feat-2-desc">Monetize your premium content and receive reader contributions.</p>
         </div>
-        <!-- Card 3 -->
         <div class="card">
-          <div class="card-icon">📈</div>
+          <div class="card-icon">⚜️</div>
           <h3 class="card-title" id="feat-3-title">Level Up Writer Rank</h3>
           <p class="card-desc" id="feat-3-desc">Earn experience points (XP) with every page and build your prestige.</p>
         </div>
-        <!-- Card 4 -->
         <div class="card">
-          <div class="card-icon">🌍</div>
+          <div class="card-icon">✨</div>
           <h3 class="card-title" id="feat-4-title">Join Global Readers</h3>
           <p class="card-desc" id="feat-4-desc">Connect with audiences worldwide, writing in English or Bangla.</p>
         </div>
-        <!-- Card 5 -->
         <div class="card">
-          <div class="card-icon">🏆</div>
+          <div class="card-icon">🎖️</div>
           <h3 class="card-title" id="feat-5-title">XP & Leaderboard</h3>
           <p class="card-desc" id="feat-5-desc">Compete with creators and prove your storytelling achievements.</p>
         </div>
-        <!-- Card 6 -->
         <div class="card">
-          <div class="card-icon">🛡️</div>
+          <div class="card-icon">🔐</div>
           <h3 class="card-title" id="feat-6-title">Secure Wallet</h3>
           <p class="card-desc" id="feat-6-desc">Manage BDT, USD, and USDT balances transparently.</p>
         </div>
@@ -586,7 +787,7 @@
     <section class="section-container">
       <h2 class="section-title" id="title-popular">Popular Stories</h2>
       <div class="preview-grid" id="popular-preview">
-        <!-- Shimmering skeletons initially -->
+        <!-- Shimmering Loaders -->
         <div class="skeleton-card"></div>
         <div class="skeleton-card"></div>
         <div class="skeleton-card"></div>
@@ -609,19 +810,19 @@
     <section class="section-container">
       <h2 class="section-title" id="title-writers">Top Authors</h2>
       <div class="preview-grid" id="writers-preview">
-        <div class="skeleton-card" style="height:80px"></div>
-        <div class="skeleton-card" style="height:80px"></div>
-        <div class="skeleton-card" style="height:80px"></div>
-        <div class="skeleton-card" style="height:80px"></div>
+        <div class="skeleton-card" style="height:100px"></div>
+        <div class="skeleton-card" style="height:100px"></div>
+        <div class="skeleton-card" style="height:100px"></div>
+        <div class="skeleton-card" style="height:100px"></div>
       </div>
     </section>
 
-    <!-- Footer Area -->
+    <!-- Footer System Area -->
     <footer class="footer">
       <div class="footer-content">
         <div class="footer-brand">
-          <h3 style="color: var(--primary-color);">StoryVerse</h3>
-          <p style="font-size: 0.9rem;" id="footer-tagline">The premium platform for sharing, discovery, and digital monetization of written media.</p>
+          <h3 style="font-family: var(--font-classic); font-size: 1.5rem; color: var(--accent-primary);">StoryVerse</h3>
+          <p id="footer-tagline">The premium platform for sharing, discovery, and digital monetization of written media.</p>
         </div>
         <div class="footer-links">
           <h4 id="footer-col-company">Company</h4>
@@ -640,29 +841,27 @@
     </footer>
   </div>
 
-  <!-- Firebase SDK Setup -->
+  <!-- Realtime Database & Auth Logic Block -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getDatabase, ref, query, orderByChild, equalTo, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Firebase configuration placeholder
+    // Dynamic configuration parsed on execution
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      databaseURL: "YOUR_DATABASE_URL",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyAbPWMaCVnM5lXfoMtW1fZ9LZBH_68pxC0",
+      authDomain: "novel-4d99f.firebaseapp.com",
+      databaseURL: "https://novel-4d99f-default-rtdb.firebaseio.com",
+      projectId: "novel-4d99f",
+      storageBucket: "novel-4d99f.firebasestorage.app",
+      messagingSenderId: "1005421601486",
+      appId: "1:1005421601486:web:53865833ac47cc3567669f"
     };
 
-    // Use actual configuration if loaded securely or fallback gracefully
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // Dictionary for Localization
     const translationData = {
       EN: {
         heroTitle: "Read, Write and Earn Stories",
@@ -728,7 +927,7 @@
         footCompany: "প্রতিষ্ঠান",
         footCommunity: "সম্প্রদায়",
         footAbout: "আমাদের সম্পর্কে",
-        footTerms: "শর্তাবলী ও গোপনীয়তা নীতি",
+        footTerms: "শর্তাবলী ও গোপনীয়তা নীতি",
         footExplore: "গল্প অন্বেষণ",
         footHub: "সোশ্যাল হাব",
         views: "ভ্যাকুয়াম",
@@ -738,30 +937,25 @@
       }
     };
 
-    // Current State Management
     let currentLang = localStorage.getItem("lang") || "EN";
     let currentTheme = localStorage.getItem("theme") || "dark";
 
-    // Application Elements
     const loader = document.getElementById("loader");
     const themeBtn = document.getElementById("btn-theme");
     const langBtn = document.getElementById("btn-lang");
     const authButtons = document.getElementById("auth-buttons");
 
-    // Initialize View Settings
     applyTheme(currentTheme);
     applyLanguage(currentLang);
     document.getElementById("current-year").textContent = new Date().getFullYear();
 
-    // Dismiss Loader
     window.addEventListener("load", () => {
       setTimeout(() => {
         loader.style.opacity = "0";
-        setTimeout(() => loader.style.display = "none", 500);
-      }, 300);
+        setTimeout(() => loader.style.display = "none", 800);
+      }, 500);
     });
 
-    // Theme Management Logic
     themeBtn.addEventListener("click", () => {
       currentTheme = currentTheme === "dark" ? "light" : "dark";
       applyTheme(currentTheme);
@@ -778,7 +972,6 @@
       localStorage.setItem("theme", theme);
     }
 
-    // Language Management Logic
     langBtn.addEventListener("click", () => {
       currentLang = currentLang === "EN" ? "BN" : "EN";
       applyLanguage(currentLang);
@@ -787,8 +980,8 @@
 
     function applyLanguage(lang) {
       const data = translationData[lang];
-      
       langBtn.textContent = lang;
+      
       document.getElementById("hero-title").textContent = data.heroTitle;
       document.getElementById("hero-desc").textContent = data.heroDesc;
       document.getElementById("btn-start-reading").textContent = data.btnStart;
@@ -830,16 +1023,13 @@
       localStorage.setItem("lang", lang);
     }
 
-    // Monitor Auth State
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Logged-in navigation states
         const activeLangData = translationData[currentLang];
         authButtons.innerHTML = `
           <a href="dashboard.html" class="btn btn-primary">${activeLangData.txtDashboard}</a>
         `;
       } else {
-        // Guest states
         const activeLangData = translationData[currentLang];
         authButtons.innerHTML = `
           <a href="login.html" class="btn btn-secondary" id="txt-login">${activeLangData.txtLogin}</a>
@@ -848,12 +1038,10 @@
       }
     });
 
-    // Content Discovery and Preview Builders
     async function fetchDisplayData() {
       const activeLang = translationData[currentLang];
 
       try {
-        // Query database reference points
         const storiesRef = ref(db, 'stories');
         const popularQuery = query(storiesRef, orderByChild('views'), limitToLast(4));
         const latestQuery = query(storiesRef, orderByChild('createdAt'), limitToLast(4));
@@ -871,8 +1059,7 @@
         renderWriters(writersSnap, "writers-preview", activeLang);
 
       } catch (err) {
-        // Fallback interface logic on validation failure or default placeholder status
-        console.warn("Database response pending configurations. Using fallback presentations.", err);
+        console.warn("RTDB initialization state pending. Falling back to layouts.", err);
         renderPlaceholderStories("popular-preview", activeLang);
         renderPlaceholderStories("latest-preview", activeLang);
         renderPlaceholderWriters("writers-preview", activeLang);
@@ -914,7 +1101,7 @@
               <span>👀 ${story.views || 0} ${lang.views}</span>
               <span>❤️ ${story.likes || 0} ${lang.likes}</span>
             </div>
-            <a href="story.html?id=${story.id}" class="btn btn-primary" style="margin-top:0.75rem; padding: 0.4rem 1rem; font-size: 0.85rem;">
+            <a href="story.html?id=${story.id}" class="btn btn-primary" style="margin-top:0.75rem; padding: 0.5rem 1.25rem; font-size: 0.8rem;">
               ${lang.read}
             </a>
           </div>
@@ -955,7 +1142,6 @@
       `).join('');
     }
 
-    // Default design state if Firebase Realtime Database is not populated yet
     function renderPlaceholderStories(elementId, lang) {
       const targetElement = document.getElementById(elementId);
       const defaults = [
@@ -1009,7 +1195,7 @@
               <span>👀 ${story.views} ${lang.views}</span>
               <span>❤️ ${story.likes} ${lang.likes}</span>
             </div>
-            <a href="story.html?id=${story.id}" class="btn btn-primary" style="margin-top:0.75rem; padding: 0.4rem 1rem; font-size: 0.85rem;">
+            <a href="story.html?id=${story.id}" class="btn btn-primary" style="margin-top:0.75rem; padding: 0.5rem 1.25rem; font-size: 0.8rem;">
               ${lang.read}
             </a>
           </div>
@@ -1037,7 +1223,6 @@
       `).join('');
     }
 
-    // Execute content loading
     fetchDisplayData();
 
   </script>
