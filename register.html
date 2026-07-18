@@ -5,18 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StoryVerse - Register</title>
   
-  <!-- Google Fonts for English and Bangla Support -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
-    /* Theme Variables */
+    /* Premium Visual Variables */
     :root {
-      --bg-gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
-      --bg-gradient-light: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f1f5f9 100%);
+      --bg-dark: #03001e;
+      --bg-light: #f5f7fb;
       
-      --glass-bg-dark: rgba(255, 255, 255, 0.03);
+      --accent-primary: #736efe;
+      --accent-secondary: #5f85ff;
+      --accent-tertiary: #ec4899;
+      --success-color: #10b981;
+      
+      --glass-bg-dark: rgba(255, 255, 255, 0.02);
       --glass-bg-light: rgba(15, 23, 42, 0.02);
       
       --glass-border-dark: rgba(255, 255, 255, 0.08);
@@ -28,88 +33,130 @@
       --text-secondary-dark: #94a3b8;
       --text-secondary-light: #475569;
       
-      --primary-color: #6366f1;
-      --primary-hover: #4f46e5;
-      --accent-color: #f43f5e;
-      --success-color: #10b981;
-      
-      --font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+      --font-classic: 'Playfair Display', serif;
+      --font-modern: 'Plus Jakarta Sans', sans-serif;
+      --font-bangla: 'Hind Siliguri', sans-serif;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: var(--font-family);
-      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+      font-family: var(--font-modern);
+      transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                  border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                  color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    /* Ambient animated mesh background */
     body {
-      background: var(--bg-gradient-dark);
+      background-color: var(--bg-dark);
       color: var(--text-primary-dark);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: 
+        radial-gradient(circle at 15% 15%, rgba(115, 110, 254, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.1) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: -1;
+      animation: drift 15s ease infinite alternate;
     }
 
     body.light-mode {
-      background: var(--bg-gradient-light);
+      background-color: var(--bg-light);
       color: var(--text-primary-light);
     }
 
-    /* Loading Spinner */
+    body.light-mode::before {
+      background: 
+        radial-gradient(circle at 15% 15%, rgba(115, 110, 254, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.04) 0%, transparent 45%);
+    }
+
+    @keyframes drift {
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.1) translate(2%, 2%); }
+    }
+
+    /* Global Loader */
     .global-loader {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #0f172a;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #03001e;
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 9999;
-      transition: opacity 0.5s ease, transform 0.5s ease;
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
     body.light-mode .global-loader {
-      background: #f8fafc;
+      background: #f5f7fb;
     }
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid rgba(99, 102, 241, 0.2);
-      border-top: 5px solid var(--primary-color);
+    
+    .spinner-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .spinner-classic {
+      position: relative;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      border: 2px solid transparent;
+      border-top-color: var(--accent-primary);
+      animation: spinClassic 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
     }
-    @keyframes spin {
+
+    .spinner-classic::before {
+      content: '';
+      position: absolute;
+      top: 4px; left: 4px; right: 4px; bottom: 4px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--accent-tertiary);
+      animation: spinClassic 1.8s linear infinite reverse;
+    }
+
+    @keyframes spinClassic {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
 
     /* Navigation Bar */
     .navbar {
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      background: var(--glass-bg-dark);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      background: rgba(3, 0, 30, 0.6);
       border-bottom: 1px solid var(--glass-border-dark);
-      padding: 1rem 2rem;
+      padding: 1.25rem 3rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     body.light-mode .navbar {
-      background: var(--glass-bg-light);
+      background: rgba(245, 247, 251, 0.6);
       border-bottom: 1px solid var(--glass-border-light);
     }
 
     .nav-logo {
-      font-size: 1.5rem;
+      font-family: var(--font-classic);
+      font-size: 1.75rem;
       font-weight: 700;
-      color: var(--primary-color);
+      letter-spacing: 0.05em;
       text-decoration: none;
-      background: linear-gradient(to right, #6366f1, #ec4899);
+      background: linear-gradient(135deg, #736efe 0%, #ec4899 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -117,58 +164,64 @@
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.25rem;
     }
 
     .control-icon {
-      background: var(--glass-bg-dark);
-      border: 1px solid var(--glass-border-dark);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       color: var(--text-primary-dark);
-      padding: 0.5rem;
-      border-radius: 8px;
+      padding: 0.65rem;
+      border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
     body.light-mode .control-icon {
-      background: var(--glass-bg-light);
-      border-color: var(--glass-border-light);
+      background: rgba(15, 23, 42, 0.02);
+      border-color: rgba(15, 23, 42, 0.08);
       color: var(--text-primary-light);
     }
+    .control-icon:hover {
+      transform: scale(1.1) rotate(15deg);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
 
-    /* Container alignment */
+    /* Container Alignment */
     .auth-container {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 3rem 1rem;
+      padding: 3rem 1.5rem;
     }
 
     .auth-card {
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
       border: 1px solid var(--glass-border-dark);
-      border-radius: 16px;
-      padding: 2.5rem;
+      border-radius: 24px;
+      padding: 3rem;
       width: 100%;
-      max-width: 580px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-      animation: floatUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      max-width: 600px;
+      box-shadow: 0 20px 40px rgba(3, 0, 30, 0.5);
+      animation: floatUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      position: relative;
     }
     body.light-mode .auth-card {
-      background: rgba(15, 23, 42, 0.01);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.01) 0%, rgba(15, 23, 42, 0.005) 100%);
       border-color: var(--glass-border-light);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05);
     }
 
     @keyframes floatUp {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(25px);
       }
       to {
         opacity: 1;
@@ -177,27 +230,29 @@
     }
 
     .auth-title {
-      font-size: 1.75rem;
+      font-family: var(--font-classic);
+      font-size: 2rem;
       font-weight: 700;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
       text-align: center;
     }
 
     .auth-subtitle {
       font-size: 0.9rem;
       color: var(--text-secondary-dark);
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
       text-align: center;
+      line-height: 1.6;
     }
     body.light-mode .auth-subtitle {
       color: var(--text-secondary-light);
     }
 
-    /* Dual input row layouts on Desktop */
+    /* Double Input Rows */
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.25rem;
+      gap: 1.5rem;
     }
 
     @media (max-width: 576px) {
@@ -208,37 +263,46 @@
     }
 
     .form-group {
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
     }
 
     .form-label {
-      font-size: 0.85rem;
-      font-weight: 500;
+      font-size: 0.825rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-secondary-dark);
+    }
+    body.light-mode .form-label {
+      color: var(--text-secondary-light);
     }
 
     .input-field {
       width: 100%;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
+      padding: 0.9rem 1.25rem;
+      border-radius: 12px;
       border: 1px solid var(--glass-border-dark);
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.02);
       color: var(--text-primary-dark);
       font-size: 0.95rem;
       outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     body.light-mode .input-field {
       border-color: var(--glass-border-light);
-      background: rgba(0, 0, 0, 0.02);
+      background: rgba(0, 0, 0, 0.01);
       color: var(--text-primary-light);
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.01);
     }
 
     .input-field:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+      border-color: var(--accent-primary);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 0 4px rgba(115, 110, 254, 0.15);
     }
 
     .input-feedback {
@@ -247,7 +311,7 @@
       display: none;
     }
     .input-feedback.error {
-      color: var(--accent-color);
+      color: var(--accent-tertiary);
       display: block;
     }
     .input-feedback.success {
@@ -255,33 +319,38 @@
       display: block;
     }
 
-    /* Selector */
+    /* Country Dropdown Custom Indicator */
     select.input-field {
-      appearance: none;
-      -webkit-appearance: none;
       cursor: pointer;
     }
 
-    /* Buttons & Checkboxes */
+    /* Buttons & Custom styled checkboxes */
     .checkbox-container {
       display: flex;
       align-items: flex-start;
-      gap: 0.5rem;
+      gap: 0.6rem;
       cursor: pointer;
       font-size: 0.85rem;
-      margin: 1rem 0 1.5rem 0;
+      margin: 1.5rem 0 2rem 0;
+      color: var(--text-secondary-dark);
+      line-height: 1.5;
+    }
+    body.light-mode .checkbox-container {
+      color: var(--text-secondary-light);
     }
 
     .checkbox-input {
-      accent-color: var(--primary-color);
+      accent-color: var(--accent-primary);
       margin-top: 0.2rem;
+      width: 15px; height: 15px;
     }
 
     .btn {
       width: 100%;
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
+      padding: 0.9rem 1.5rem;
+      border-radius: 40px;
       font-weight: 600;
+      letter-spacing: 0.05em;
       cursor: pointer;
       border: none;
       outline: none;
@@ -289,35 +358,51 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      gap: 0.6rem;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
     }
     .btn:active {
-      transform: scale(0.97);
+      transform: scale(0.98);
     }
+    
     .btn-primary {
-      background: var(--primary-color);
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
       color: #fff;
+      box-shadow: 0 4px 15px rgba(115, 110, 254, 0.25);
     }
     .btn-primary:hover {
-      background: var(--primary-hover);
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(115, 110, 254, 0.4);
+    }
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.6s ease;
+    }
+    .btn:hover::after {
+      left: 100%;
     }
 
     .error-banner {
-      background: rgba(244, 63, 94, 0.1);
-      border: 1px solid rgba(244, 63, 94, 0.3);
-      color: var(--accent-color);
-      padding: 0.75rem;
-      border-radius: 8px;
+      background: rgba(244, 63, 94, 0.06);
+      border: 1px solid rgba(244, 63, 94, 0.2);
+      color: var(--accent-tertiary);
+      padding: 0.9rem;
+      border-radius: 12px;
       font-size: 0.85rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      line-height: 1.5;
       display: none;
     }
 
     .switch-auth-link {
       text-align: center;
-      margin-top: 1.5rem;
+      margin-top: 2rem;
       font-size: 0.9rem;
       color: var(--text-secondary-dark);
     }
@@ -325,9 +410,9 @@
       color: var(--text-secondary-light);
     }
     .switch-auth-link a {
-      color: var(--primary-color);
+      color: var(--accent-primary);
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 700;
     }
     .switch-auth-link a:hover {
       text-decoration: underline;
@@ -338,7 +423,10 @@
 
   <!-- Loading Animation Overlay -->
   <div class="global-loader" id="loader">
-    <div class="spinner"></div>
+    <div class="spinner-box">
+      <div class="spinner-classic"></div>
+      <div class="loader-logo">StoryVerse</div>
+    </div>
   </div>
 
   <header class="navbar">
@@ -439,15 +527,15 @@
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getDatabase, ref, set, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Firebase config placeholder
+    // Active client configurations
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      databaseURL: "YOUR_DATABASE_URL",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyAbPWMaCVnM5lXfoMtW1fZ9LZBH_68pxC0",
+      authDomain: "novel-4d99f.firebaseapp.com",
+      databaseURL: "https://novel-4d99f-default-rtdb.firebaseio.com",
+      projectId: "novel-4d99f",
+      storageBucket: "novel-4d99f.firebasestorage.app",
+      messagingSenderId: "1005421601486",
+      appId: "1:1005421601486:web:53865833ac47cc3567669f"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -532,8 +620,8 @@
     window.addEventListener("load", () => {
       setTimeout(() => {
         loader.style.opacity = "0";
-        setTimeout(() => loader.style.display = "none", 500);
-      }, 300);
+        setTimeout(() => loader.style.display = "none", 800);
+      }, 500);
     });
 
     themeBtn.addEventListener("click", () => {
@@ -590,7 +678,6 @@
 
       if (!username) return;
 
-      // Regular expression matching Rules: 4-20 length, A-Z, a-z, 0-9, underscore
       const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
       if (!usernameRegex.test(username)) {
         usernameFeedback.textContent = translations[currentLang].errInvalidUsername;
@@ -598,7 +685,6 @@
         return;
       }
 
-      // Debounce check for efficiency
       usernameTimeout = setTimeout(async () => {
         try {
           const usersRef = ref(db, "users");
@@ -635,14 +721,12 @@
       const referral = document.getElementById("reg-referral").value.trim();
       const submitBtn = document.getElementById("btn-submit");
 
-      // Verify username validity status
       if (!isUsernameValid) {
         errorBanner.textContent = translations[currentLang].errInvalidUsername;
         errorBanner.style.display = "block";
         return;
       }
 
-      // Password checks
       if (password.length < 6) {
         errorBanner.textContent = translations[currentLang].errPassLength;
         errorBanner.style.display = "block";
@@ -659,11 +743,9 @@
       submitBtn.textContent = translations[currentLang].btnLoading;
 
       try {
-        // Create Firebase Authentication Account
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // User Record Profile Schema creation in RTDB
         const userProfileRef = ref(db, `users/${user.uid}`);
         await set(userProfileRef, {
           name: name,
@@ -695,7 +777,6 @@
           language: currentLang === "EN" ? "English" : "Bangla"
         });
 
-        // Initialize User balance structures explicitly inside wallets/ structure
         const walletRef = ref(db, `wallets/${user.uid}`);
         await set(walletRef, {
           bdt: 0,
@@ -706,7 +787,6 @@
           spent: 0
         });
 
-        // Redirect on successful record creation
         window.location.href = "home.html";
 
       } catch (error) {
