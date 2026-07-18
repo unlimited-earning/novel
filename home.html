@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StoryVerse - Home Feed</title>
+  
+  <!-- Google Fonts for English and Bangla Support -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Theme Variables */
+    :root {
+      --bg-gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
+      --bg-gradient-light: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f1f5f9 100%);
+      
+      --glass-bg-dark: rgba(255, 255, 255, 0.03);
+      --glass-bg-light: rgba(15, 23, 42, 0.02);
+      
+      --glass-border-dark: rgba(255, 255, 255, 0.08);
+      --glass-border-light: rgba(15, 23, 42, 0.08);
+      
+      --text-primary-dark: #f8fafc;
+      --text-primary-light: #0f172a;
+      
+      --text-secondary-dark: #94a3b8;
+      --text-secondary-light: #475569;
+      
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-color: #f43f5e;
+      --success-color: #10b981;
+      
+      --font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    body {
+      background: var(--bg-gradient-dark);
+      color: var(--text-primary-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      padding-bottom: 70px; /* Space for Mobile Bottom Nav */
+    }
+
+    body.light-mode {
+      background: var(--bg-gradient-light);
+      color: var(--text-primary-light);
+    }
+
+    /* Loading Spinner */
+    .global-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    body.light-mode .global-loader {
+      background: #f8fafc;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(99, 102, 241, 0.2);
+      border-top: 5px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: var(--glass-bg-dark);
+      border-bottom: 1px solid var(--glass-border-dark);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    body.light-mode .navbar {
+      background: var(--glass-bg-light);
+      border-bottom: 1px solid var(--glass-border-light);
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+      background: linear-gradient(to right, #6366f1, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .control-icon {
+      background: var(--glass-bg-dark);
+      border: 1px solid var(--glass-border-dark);
+      color: var(--text-primary-dark);
+      padding: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      text-decoration: none;
+    }
+    body.light-mode .control-icon {
+      background: var(--glass-bg-light);
+      border-color: var(--glass-border-light);
+      color: var(--text-primary-light);
+    }
+
+    /* Layout Wrapper */
+    .feed-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: var(--primary-color);
+      border-radius: 2px;
+    }
+
+    .see-all {
+      font-size: 0.9rem;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .see-all:hover {
+      text-decoration: underline;
+    }
+
+    /* Category Filter Badges */
+    .category-scroll {
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      scrollbar-width: none; /* Hide standard Firefox scrollbar */
+    }
+    .category-scroll::-webkit-scrollbar {
+      display: none; /* Hide Chrome/Safari scrollbar */
+    }
+
+    .category-badge {
+      background: var(--glass-bg-dark);
+      border: 1px solid var(--glass-border-dark);
+      color: var(--text-primary-dark);
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    body.light-mode .category-badge {
+      background: var(--glass-bg-light);
+      border-color: var(--glass-border-light);
+      color: var(--text-primary-light);
+    }
+    .category-badge.active, .category-badge:hover {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: #fff;
+    }
+
+    /* Grid Layouts */
+    .story-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .story-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--glass-bg-dark);
+      border: 1px solid var(--glass-border-dark);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    body.light-mode .story-card {
+      background: var(--glass-bg-light);
+      border-color: var(--glass-border-light);
+    }
+    .story-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    body.light-mode .story-card:hover {
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    }
+
+    .story-cover {
+      height: 180px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .story-lang-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+
+    .story-info {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      gap: 0.5rem;
+    }
+
+    .story-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .story-author {
+      font-size: 0.85rem;
+      color: var(--text-secondary-dark);
+    }
+    body.light-mode .story-author {
+      color: var(--text-secondary-light);
+    }
+
+    .story-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--glass-border-dark);
+      color: var(--text-secondary-dark);
+    }
+    body.light-mode .story-meta {
+      border-color: var(--glass-border-light);
+      color: var(--text-secondary-light);
+    }
+
+    .btn-read {
+      margin-top: 0.75rem;
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      background: var(--primary-color);
+      color: white;
+      font-size: 0.85rem;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-read:hover {
+      background: var(--primary-hover);
+    }
+
+    /* Top Writers horizontal list */
+    .writers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .writer-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--glass-bg-dark);
+      border: 1px solid var(--glass-border-dark);
+      border-radius: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+    body.light-mode .writer-card {
+      background: var(--glass-bg-light);
+      border-color: var(--glass-border-light);
+    }
+    .writer-card:hover {
+      transform: translateY(-2px);
+    }
+    .writer-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #475569;
+      background-size: cover;
+      background-position: center;
+    }
+    .writer-details {
+      display: flex;
+      flex-direction: column;
+    }
+    .writer-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .writer-sub {
+      font-size: 0.8rem;
+      color: var(--text-secondary-dark);
+    }
+    body.light-mode .writer-sub {
+      color: var(--text-secondary-light);
+    }
+
+    /* Shimmer Skeleton Loaders */
+    .skeleton-card {
+      height: 320px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s infinite;
+      border-radius: 12px;
+    }
+    body.light-mode .skeleton-card {
+      background: linear-gradient(90deg, rgba(0,0,0,0.03) 25%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.03) 75%);
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Mobile Bottom Navigation Bar (Fixed) */
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 65px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(15, 23, 42, 0.8);
+      border-top: 1px solid var(--glass-border-dark);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 999;
+    }
+    body.light-mode .mobile-nav {
+      background: rgba(248, 250, 252, 0.8);
+      border-top-color: var(--glass-border-light);
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-secondary-dark);
+      font-size: 0.75rem;
+      font-weight: 500;
+      gap: 0.25rem;
+    }
+    body.light-mode .mobile-nav-item {
+      color: var(--text-secondary-light);
+    }
+
+    .mobile-nav-item.active {
+      color: var(--primary-color);
+    }
+
+    .mobile-nav-icon {
+      font-size: 1.25rem;
+    }
+
+    /* Hide standard desktop controls in bottom nav on wide viewports if desired */
+    @media (min-width: 769px) {
+      /* Bottom navigation is useful on all touch/mobile formats, but we keep it beautifully integrated */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Animation Overlay -->
+  <div class="global-loader" id="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Main Sticky Header -->
+  <header class="navbar">
+    <a href="home.html" class="nav-logo">StoryVerse</a>
+    <div class="nav-actions">
+      <!-- Search redirection -->
+      <a href="search.html" class="control-icon" title="Search Stories">🔍</a>
+      <!-- Notification redirection -->
+      <a href="notifications.html" class="control-icon" title="Notifications">🔔</a>
+      <!-- Language configuration -->
+      <button class="control-icon" id="btn-lang">EN</button>
+      <!-- Theme Configuration -->
+      <button class="control-icon" id="btn-theme">🌙</button>
+    </div>
+  </header>
+
+  <!-- Feed content structures -->
+  <main class="feed-container">
+    
+    <!-- Quick filter selector system -->
+    <div>
+      <div class="category-scroll" id="category-scroll">
+        <a href="explore.html" class="category-badge active" id="badge-all">All Stories</a>
+        <a href="explore.html?cat=Fantasy" class="category-badge">Fantasy</a>
+        <a href="explore.html?cat=Romance" class="category-badge">Romance</a>
+        <a href="explore.html?cat=Action" class="category-badge">Action</a>
+        <a href="explore.html?cat=Horror" class="category-badge">Horror</a>
+        <a href="explore.html?cat=Adventure" class="category-badge">Adventure</a>
+        <a href="explore.html?cat=Sci-Fi" class="category-badge">Sci-Fi</a>
+        <a href="explore.html?cat=Mystery" class="category-badge">Mystery</a>
+      </div>
+    </div>
+
+    <!-- Trending Stories Section -->
+    <section>
+      <div class="section-header">
+        <h2 class="section-title" id="sec-trending">Trending Stories</h2>
+        <a href="explore.html?sort=views" class="see-all" id="see-trending">See All</a>
+      </div>
+      <div class="story-grid" id="trending-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </section>
+
+    <!-- Recommended Stories Section -->
+    <section>
+      <div class="section-header">
+        <h2 class="section-title" id="sec-recommended">Recommended For You</h2>
+        <a href="explore.html" class="see-all" id="see-recommended">See All</a>
+      </div>
+      <div class="story-grid" id="recommended-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </section>
+
+    <!-- Latest Releases Section -->
+    <section>
+      <div class="section-header">
+        <h2 class="section-title" id="sec-latest">Latest Releases</h2>
+        <a href="explore.html?sort=latest" class="see-all" id="see-latest">See All</a>
+      </div>
+      <div class="story-grid" id="latest-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </section>
+
+    <!-- Top Writers Section -->
+    <section>
+      <div class="section-header">
+        <h2 class="section-title" id="sec-writers">Top Authors</h2>
+        <a href="top-writers.html" class="see-all" id="see-writers">See All</a>
+      </div>
+      <div class="writers-grid" id="writers-grid">
+        <div class="skeleton-card" style="height: 80px;"></div>
+        <div class="skeleton-card" style="height: 80px;"></div>
+        <div class="skeleton-card" style="height: 80px;"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Mobile Bottom Navigation (Always Present on Dashboard contexts) -->
+  <nav class="mobile-nav">
+    <a href="home.html" class="mobile-nav-item active">
+      <span class="mobile-nav-icon">🏠</span>
+      <span id="nav-home">Home</span>
+    </a>
+    <a href="explore.html" class="mobile-nav-item">
+      <span class="mobile-nav-icon">🧭</span>
+      <span id="nav-explore">Explore</span>
+    </a>
+    <a href="library.html" class="mobile-nav-item">
+      <span class="mobile-nav-icon">📚</span>
+      <span id="nav-library">Library</span>
+    </a>
+    <a href="wallet.html" class="mobile-nav-item">
+      <span class="mobile-nav-icon">💳</span>
+      <span id="nav-wallet">Wallet</span>
+    </a>
+    <a href="profile.html" class="mobile-nav-item">
+      <span class="mobile-nav-icon">👤</span>
+      <span id="nav-profile">Profile</span>
+    </a>
+  </nav>
+
+  <!-- Firebase Integration modules -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, query, orderByChild, equalTo, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Firebase config placeholder
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const translations = {
+      EN: {
+        badgeAll: "All Stories",
+        secTrending: "Trending Stories",
+        secRecommended: "Recommended For You",
+        secLatest: "Latest Releases",
+        secWriters: "Top Authors",
+        seeAll: "See All",
+        navHome: "Home",
+        navExplore: "Explore",
+        navLibrary: "Library",
+        navWallet: "Wallet",
+        navProfile: "Profile",
+        views: "Views",
+        likes: "Likes",
+        followers: "Followers",
+        read: "Read"
+      },
+      BN: {
+        badgeAll: "সব গল্প",
+        secTrending: "জনপ্রিয় গল্পসমূহ",
+        secRecommended: "আপনার জন্য প্রস্তাবিত",
+        secLatest: "নতুন প্রকাশিত গল্প",
+        secWriters: "সেরা লেখকগণ",
+        seeAll: "সব দেখুন",
+        navHome: "হোম",
+        navExplore: "অন্বেষণ",
+        navLibrary: "লাইব্রেরি",
+        navWallet: "ওয়ালেট",
+        navProfile: "প্রোফাইল",
+        views: "ভ্যাকুয়াম",
+        likes: "পছন্দ",
+        followers: "অনুসারী",
+        read: "পড়ুন"
+      }
+    };
+
+    let currentLang = localStorage.getItem("lang") || "EN";
+    let currentTheme = localStorage.getItem("theme") || "dark";
+
+    const loader = document.getElementById("loader");
+    const themeBtn = document.getElementById("btn-theme");
+    const langBtn = document.getElementById("btn-lang");
+
+    applyTheme(currentTheme);
+    applyLanguage(currentLang);
+
+    // Security check: Redirect guests to login page immediately
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        fetchFeedData();
+      }
+    });
+
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        loader.style.opacity = "0";
+        setTimeout(() => loader.style.display = "none", 500);
+      }, 300);
+    });
+
+    themeBtn.addEventListener("click", () => {
+      currentTheme = currentTheme === "dark" ? "light" : "dark";
+      applyTheme(currentTheme);
+    });
+
+    function applyTheme(theme) {
+      if (theme === "light") {
+        document.body.classList.add("light-mode");
+        themeBtn.textContent = "☀️";
+      } else {
+        document.body.classList.remove("light-mode");
+        themeBtn.textContent = "🌙";
+      }
+      localStorage.setItem("theme", theme);
+    }
+
+    langBtn.addEventListener("click", () => {
+      currentLang = currentLang === "EN" ? "BN" : "EN";
+      applyLanguage(currentLang);
+      fetchFeedData();
+    });
+
+    function applyLanguage(lang) {
+      const data = translations[lang];
+      langBtn.textContent = lang;
+
+      document.getElementById("badge-all").textContent = data.badgeAll;
+      document.getElementById("sec-trending").textContent = data.secTrending;
+      document.getElementById("sec-recommended").textContent = data.secRecommended;
+      document.getElementById("sec-latest").textContent = data.secLatest;
+      document.getElementById("sec-writers").textContent = data.secWriters;
+
+      document.querySelectorAll(".see-all").forEach(elem => {
+        elem.textContent = data.seeAll;
+      });
+
+      document.getElementById("nav-home").textContent = data.navHome;
+      document.getElementById("nav-explore").textContent = data.navExplore;
+      document.getElementById("nav-library").textContent = data.navLibrary;
+      document.getElementById("nav-wallet").textContent = data.navWallet;
+      document.getElementById("nav-profile").textContent = data.navProfile;
+
+      localStorage.setItem("lang", lang);
+    }
+
+    // Fetch and filter feed items
+    async function fetchFeedData() {
+      const dataLang = translations[currentLang];
+
+      try {
+        const storiesRef = ref(db, 'stories');
+        const usersRef = ref(db, 'users');
+
+        const [storiesSnap, usersSnap] = await Promise.all([
+          get(query(storiesRef, orderByChild('status'), equalTo('approved'))),
+          get(query(usersRef, orderByChild('writer'), equalTo(true)))
+        ]);
+
+        let stories = [];
+        if (storiesSnap.exists()) {
+          storiesSnap.forEach(child => {
+            stories.push({ id: child.key, ...child.val() });
+          });
+        }
+
+        // Render sections or fallback with placeholders
+        if (stories.length > 0) {
+          // Trending: Sort by views
+          const trendingList = [...stories].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 4);
+          renderStoriesGrid(trendingList, "trending-grid", dataLang);
+
+          // Recommended: Simple filter (e.g. mix/match or random shuffle for diversity)
+          const recommendedList = [...stories].sort(() => 0.5 - Math.random()).slice(0, 4);
+          renderStoriesGrid(recommendedList, "recommended-grid", dataLang);
+
+          // Latest: Sort by createdAt timestamp descending
+          const latestList = [...stories].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 4);
+          renderStoriesGrid(latestList, "latest-grid", dataLang);
+        } else {
+          renderPlaceholderStories("trending-grid", dataLang);
+          renderPlaceholderStories("recommended-grid", dataLang);
+          renderPlaceholderStories("latest-grid", dataLang);
+        }
+
+        if (usersSnap.exists()) {
+          let writers = [];
+          usersSnap.forEach(child => {
+            writers.push({ uid: child.key, ...child.val() });
+          });
+          writers.sort((a, b) => (b.followers || 0) - (a.followers || 0));
+          renderWritersGrid(writers.slice(0, 4), "writers-grid", dataLang);
+        } else {
+          renderPlaceholderWriters("writers-grid", dataLang);
+        }
+
+      } catch (err) {
+        console.warn("RTDB queries failed. Loading simulation.", err);
+        renderPlaceholderStories("trending-grid", dataLang);
+        renderPlaceholderStories("recommended-grid", dataLang);
+        renderPlaceholderStories("latest-grid", dataLang);
+        renderPlaceholderWriters("writers-grid", dataLang);
+      }
+    }
+
+    function renderStoriesGrid(list, elementId, lang) {
+      const grid = document.getElementById(elementId);
+      if (list.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary-dark);">No stories available</div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map(story => `
+        <article class="story-card">
+          <div class="story-cover" style="background-image: url('${story.cover || 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=600'}');">
+            <span class="story-lang-badge">${story.language === 'Bangla' ? 'বাংলা' : 'EN'}</span>
+          </div>
+          <div class="story-info">
+            <h3 class="story-title" title="${story.title}">${story.title}</h3>
+            <p class="story-author">By ${story.authorName}</p>
+            <div class="story-meta">
+              <span>👀 ${story.views || 0} ${lang.views}</span>
+              <span>❤️ ${story.likes || 0} ${lang.likes}</span>
+            </div>
+            <a href="story.html?id=${story.id}" class="btn-read">
+              ${lang.read}
+            </a>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderWritersGrid(list, elementId, lang) {
+      const grid = document.getElementById(elementId);
+      grid.innerHTML = list.map(writer => `
+        <a href="writer-profile.html?uid=${writer.uid}" class="writer-card">
+          <div class="writer-avatar" style="background-image: url('${writer.profileImage || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200'}')"></div>
+          <div class="writer-details">
+            <span class="writer-name">${writer.name || writer.username}</span>
+            <span class="writer-sub">${writer.followers || 0} ${lang.followers} • Lvl ${writer.level || 1}</span>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    function renderPlaceholderStories(elementId, lang) {
+      const targetElement = document.getElementById(elementId);
+      const defaults = [
+        { id: "p1", title: "Chronicles of the Spark", authorName: "Lidya Vance", cover: "https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=600", language: "English", views: 1800, likes: 450 },
+        { id: "p2", title: "রূপকথার অন্তরালে", authorName: "Kazi Nazrul", cover: "https://images.unsplash.com/photo-1474932430478-367db2683dac?q=80&w=600", language: "Bangla", views: 2500, likes: 620 },
+        { id: "p3", title: "Shadow of the Moon", authorName: "Michael Croft", cover: "https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?q=80&w=600", language: "English", views: 920, likes: 180 },
+        { id: "p4", title: "অনন্ত নক্ষত্র বীথি", authorName: "Humayun Ahmed", cover: "https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=600", language: "Bangla", views: 3400, likes: 1100 }
+      ];
+      renderStoriesGrid(defaults, elementId, lang);
+    }
+
+    function renderPlaceholderWriters(elementId, lang) {
+      const targetElement = document.getElementById(elementId);
+      const defaults = [
+        { uid: "w1", name: "Humayun Ahmed", followers: 5800, level: 12, profileImage: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200" },
+        { uid: "w2", name: "Lidya Vance", followers: 1420, level: 7, profileImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200" },
+        { uid: "w3", name: "Kazi Nazrul", followers: 4500, level: 10, profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200" }
+      ];
+      renderWritersGrid(defaults, elementId, lang);
+    }
+  </script>
+</body>
+</html>
