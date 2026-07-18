@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StoryVerse - Read, Write and Earn Stories</title>
+  
+  <!-- Google Fonts for English and Bangla Support -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Theme Variables */
+    :root {
+      --bg-gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
+      --bg-gradient-light: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f1f5f9 100%);
+      
+      --glass-bg-dark: rgba(255, 255, 255, 0.03);
+      --glass-bg-light: rgba(15, 23, 42, 0.02);
+      
+      --glass-border-dark: rgba(255, 255, 255, 0.08);
+      --glass-border-light: rgba(15, 23, 42, 0.08);
+      
+      --text-primary-dark: #f8fafc;
+      --text-primary-light: #0f172a;
+      
+      --text-secondary-dark: #94a3b8;
+      --text-secondary-light: #475569;
+      
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-color: #f43f5e;
+      --success-color: #10b981;
+      
+      --font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+    }
+
+    /* Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    body {
+      background: var(--bg-gradient-dark);
+      color: var(--text-primary-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    body.light-mode {
+      background: var(--bg-gradient-light);
+      color: var(--text-primary-light);
+    }
+
+    /* Core Layout Wrapper */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Global Loader */
+    .global-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    body.light-mode .global-loader {
+      background: #f8fafc;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(99, 102, 241, 0.2);
+      border-top: 5px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Navbar styling */
+    .navbar {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: var(--glass-bg-dark);
+      border-bottom: 1px solid var(--glass-border-dark);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    body.light-mode .navbar {
+      background: var(--glass-bg-light);
+      border-bottom: 1px solid var(--glass-border-light);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+      background: linear-gradient(to right, #6366f1, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Generic buttons */
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border: none;
+      outline: none;
+      font-size: 0.9rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--glass-border-dark);
+      color: var(--text-primary-dark);
+    }
+    body.light-mode .btn-secondary {
+      border-color: var(--glass-border-light);
+      color: var(--text-primary-light);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    body.light-mode .btn-secondary:hover {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    /* Controls for Theme & Lang */
+    .control-icon {
+      background: var(--glass-bg-dark);
+      border: 1px solid var(--glass-border-dark);
+      color: var(--text-primary-dark);
+      padding: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    body.light-mode .control-icon {
+      background: var(--glass-bg-light);
+      border-color: var(--glass-border-light);
+      color: var(--text-primary-light);
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 6rem 2rem 4rem 2rem;
+      position: relative;
+    }
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(to right, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    body.light-mode .hero-title {
+      background: linear-gradient(to right, #0f172a, #475569);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-tagline {
+      font-size: 1.5rem;
+      color: var(--text-secondary-dark);
+      margin-bottom: 2.5rem;
+    }
+    body.light-mode .hero-tagline {
+      color: var(--text-secondary-light);
+    }
+    .hero-ctas {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .hero-ctas .btn {
+      padding: 0.9rem 1.8rem;
+      font-size: 1rem;
+    }
+
+    /* Features Grid */
+    .section-container {
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 0 1.5rem;
+    }
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      text-align: center;
+      position: relative;
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: var(--primary-color);
+      border-radius: 2px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: var(--glass-bg-dark);
+      border: 1px solid var(--glass-border-dark);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    body.light-mode .card {
+      background: var(--glass-bg-light);
+      border-color: var(--glass-border-light);
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    body.light-mode .card:hover {
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+    .card-icon {
+      font-size: 2.5rem;
+      color: var(--primary-color);
+    }
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .card-desc {
+      color: var(--text-secondary-dark);
+      font-size: 0.95rem;
+    }
+    body.light-mode .card-desc {
+      color: var(--text-secondary-light);
+    }
+
+    /* Content Previews */
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .story-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--glass-bg-dark);
+      border: 1px solid var(--glass-border-dark);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    body.light-mode .story-card {
+      background: var(--glass-bg-light);
+      border-color: var(--glass-border-light);
+    }
+    .story-card:hover {
+      transform: translateY(-4px);
+    }
+    .story-cover {
+      height: 180px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .story-lang-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+    .story-info {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      gap: 0.5rem;
+    }
+    .story-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .story-author {
+      font-size: 0.85rem;
+      color: var(--text-secondary-dark);
+    }
+    body.light-mode .story-author {
+      color: var(--text-secondary-light);
+    }
+    .story-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-top: auto;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--glass-border-dark);
+      color: var(--text-secondary-dark);
+    }
+    body.light-mode .story-meta {
+      border-color: var(--glass-border-light);
+      color: var(--text-secondary-light);
+    }
+
+    /* Skeleton Loading states */
+    .skeleton-card {
+      height: 300px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s infinite;
+      border-radius: 12px;
+    }
+    body.light-mode .skeleton-card {
+      background: linear-gradient(90deg, rgba(0,0,0,0.03) 25%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.03) 75%);
+      background-size: 200% 100%;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Top Writers */
+    .writer-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--glass-bg-dark);
+      border: 1px solid var(--glass-border-dark);
+      border-radius: 12px;
+    }
+    body.light-mode .writer-card {
+      background: var(--glass-bg-light);
+      border-color: var(--glass-border-light);
+    }
+    .writer-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #475569;
+      background-size: cover;
+      background-position: center;
+    }
+    .writer-details {
+      display: flex;
+      flex-direction: column;
+    }
+    .writer-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .writer-sub {
+      font-size: 0.8rem;
+      color: var(--text-secondary-dark);
+    }
+    body.light-mode .writer-sub {
+      color: var(--text-secondary-light);
+    }
+
+    /* Footer styles */
+    .footer {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: var(--glass-bg-dark);
+      border-top: 1px solid var(--glass-border-dark);
+      padding: 3rem 2rem;
+      margin-top: auto;
+    }
+    body.light-mode .footer {
+      background: var(--glass-bg-light);
+      border-color: var(--glass-border-light);
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .footer-links a {
+      color: var(--text-secondary-dark);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s ease;
+    }
+    body.light-mode .footer-links a {
+      color: var(--text-secondary-light);
+    }
+    .footer-links a:hover {
+      color: var(--primary-color);
+    }
+    .footer-bottom {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-secondary-dark);
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--glass-border-dark);
+    }
+    body.light-mode .footer-bottom {
+      color: var(--text-secondary-light);
+      border-color: var(--glass-border-light);
+    }
+
+    /* Responsive adjustment */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      .hero-tagline {
+        font-size: 1.15rem;
+      }
+      .navbar {
+        padding: 1rem;
+      }
+      .nav-logo {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Overlay -->
+  <div class="global-loader" id="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Navbar Header -->
+    <header class="navbar">
+      <a href="index.html" class="nav-logo">StoryVerse</a>
+      <div class="nav-actions">
+        <!-- Language Select Toggle -->
+        <button class="control-icon" id="btn-lang" title="Switch Language" aria-label="Switch Language">EN</button>
+        <!-- Dark/Light Theme Toggle -->
+        <button class="control-icon" id="btn-theme" title="Toggle Theme" aria-label="Toggle Theme">🌙</button>
+        <!-- Auth Dependent Action Buttons -->
+        <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
+          <a href="login.html" class="btn btn-secondary" id="txt-login">Login</a>
+          <a href="register.html" class="btn btn-primary" id="txt-register">Register</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Area -->
+    <section class="hero">
+      <h1 class="hero-title" id="hero-title">Read, Write and Earn Stories</h1>
+      <p class="hero-tagline" id="hero-desc">Discover worlds crafted by talented creators, grow your library, and earn monetization value straight to your secured wallet.</p>
+      <div class="hero-ctas">
+        <a href="explore.html" class="btn btn-primary" id="btn-start-reading">Start Reading</a>
+        <a href="writer-activation.html" class="btn btn-secondary" id="btn-become-writer">Become Writer</a>
+      </div>
+    </section>
+
+    <!-- Features Area -->
+    <section class="section-container">
+      <h2 class="section-title" id="title-features">Platform Highlights</h2>
+      <div class="features-grid" id="features-grid">
+        <!-- Card 1 -->
+        <div class="card">
+          <div class="card-icon">✍️</div>
+          <h3 class="card-title" id="feat-1-title">Publish Stories</h3>
+          <p class="card-desc" id="feat-1-desc">Share your stories with a passionate community of global readers.</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="card">
+          <div class="card-icon">💰</div>
+          <h3 class="card-title" id="feat-2-title">Earn From Chapters</h3>
+          <p class="card-desc" id="feat-2-desc">Monetize your premium content and receive reader contributions.</p>
+        </div>
+        <!-- Card 3 -->
+        <div class="card">
+          <div class="card-icon">📈</div>
+          <h3 class="card-title" id="feat-3-title">Level Up Writer Rank</h3>
+          <p class="card-desc" id="feat-3-desc">Earn experience points (XP) with every page and build your prestige.</p>
+        </div>
+        <!-- Card 4 -->
+        <div class="card">
+          <div class="card-icon">🌍</div>
+          <h3 class="card-title" id="feat-4-title">Join Global Readers</h3>
+          <p class="card-desc" id="feat-4-desc">Connect with audiences worldwide, writing in English or Bangla.</p>
+        </div>
+        <!-- Card 5 -->
+        <div class="card">
+          <div class="card-icon">🏆</div>
+          <h3 class="card-title" id="feat-5-title">XP & Leaderboard</h3>
+          <p class="card-desc" id="feat-5-desc">Compete with creators and prove your storytelling achievements.</p>
+        </div>
+        <!-- Card 6 -->
+        <div class="card">
+          <div class="card-icon">🛡️</div>
+          <h3 class="card-title" id="feat-6-title">Secure Wallet</h3>
+          <p class="card-desc" id="feat-6-desc">Manage BDT, USD, and USDT balances transparently.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Popular Stories Section -->
+    <section class="section-container">
+      <h2 class="section-title" id="title-popular">Popular Stories</h2>
+      <div class="preview-grid" id="popular-preview">
+        <!-- Shimmering skeletons initially -->
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </section>
+
+    <!-- Latest Stories Section -->
+    <section class="section-container">
+      <h2 class="section-title" id="title-latest">Latest Releases</h2>
+      <div class="preview-grid" id="latest-preview">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </section>
+
+    <!-- Top Writers Section -->
+    <section class="section-container">
+      <h2 class="section-title" id="title-writers">Top Authors</h2>
+      <div class="preview-grid" id="writers-preview">
+        <div class="skeleton-card" style="height:80px"></div>
+        <div class="skeleton-card" style="height:80px"></div>
+        <div class="skeleton-card" style="height:80px"></div>
+        <div class="skeleton-card" style="height:80px"></div>
+      </div>
+    </section>
+
+    <!-- Footer Area -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <h3 style="color: var(--primary-color);">StoryVerse</h3>
+          <p style="font-size: 0.9rem;" id="footer-tagline">The premium platform for sharing, discovery, and digital monetization of written media.</p>
+        </div>
+        <div class="footer-links">
+          <h4 id="footer-col-company">Company</h4>
+          <a href="about.html" id="foot-about">About Us</a>
+          <a href="terms-privacy.html" id="foot-terms">Terms & Privacy Policy</a>
+        </div>
+        <div class="footer-links">
+          <h4 id="footer-col-community">Community</h4>
+          <a href="explore.html" id="foot-explore">Explore Stories</a>
+          <a href="community.html" id="foot-community">Social Hub</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span id="current-year"></span> StoryVerse. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Firebase SDK Setup -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, query, orderByChild, equalTo, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Firebase configuration placeholder
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Use actual configuration if loaded securely or fallback gracefully
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // Dictionary for Localization
+    const translationData = {
+      EN: {
+        heroTitle: "Read, Write and Earn Stories",
+        heroDesc: "Discover worlds crafted by talented creators, grow your library, and earn monetization value straight to your secured wallet.",
+        btnStart: "Start Reading",
+        btnBecomeWriter: "Become Writer",
+        txtLogin: "Login",
+        txtRegister: "Register",
+        txtDashboard: "Dashboard",
+        txtFeatures: "Platform Highlights",
+        feat1Title: "Publish Stories",
+        feat1Desc: "Share your stories with a passionate community of global readers.",
+        feat2Title: "Earn From Chapters",
+        feat2Desc: "Monetize your premium content and receive reader contributions.",
+        feat3Title: "Level Up Writer Rank",
+        feat3Desc: "Earn experience points (XP) with every page and build your prestige.",
+        feat4Title: "Join Global Readers",
+        feat4Desc: "Connect with audiences worldwide, writing in English or Bangla.",
+        feat5Title: "XP & Leaderboard",
+        feat5Desc: "Compete with creators and prove your storytelling achievements.",
+        feat6Title: "Secure Wallet",
+        feat6Desc: "Manage BDT, USD, and USDT balances transparently.",
+        titlePopular: "Popular Stories",
+        titleLatest: "Latest Releases",
+        titleWriters: "Top Authors",
+        footTagline: "The premium platform for sharing, discovery, and digital monetization of written media.",
+        footCompany: "Company",
+        footCommunity: "Community",
+        footAbout: "About Us",
+        footTerms: "Terms & Privacy Policy",
+        footExplore: "Explore Stories",
+        footHub: "Social Hub",
+        views: "Views",
+        likes: "Likes",
+        followers: "Followers",
+        read: "Read"
+      },
+      BN: {
+        heroTitle: "গল্প পড়ুন, লিখুন এবং আয় করুন",
+        heroDesc: "মেধাবী লেখকদের তৈরি চমৎকার জগৎ আবিষ্কার করুন, আপনার নিজস্ব লাইব্রেরি সমৃদ্ধ করুন এবং আপনার নিরাপদ ওয়ালেটে সরাসরি অর্থ উপার্জন করুন।",
+        btnStart: "পড়া শুরু করুন",
+        btnBecomeWriter: "লেখক হন",
+        txtLogin: "লগইন",
+        txtRegister: "নিবন্ধন",
+        txtDashboard: "ড্যাশবোর্ড",
+        txtFeatures: "প্ল্যাটফর্মের আকর্ষণসমূহ",
+        feat1Title: "গল্প প্রকাশ করুন",
+        feat1Desc: "বিশ্বজুড়ে পাঠকদের আবেগপূর্ণ সম্প্রদায়ের সাথে আপনার গল্প ভাগ করুন।",
+        feat2Title: "অধ্যায় থেকে উপার্জন",
+        feat2Desc: "আপনার প্রিমিয়াম লেখার উপর মূল্য নির্ধারণ ও অবদান গ্রহণ করুন।",
+        feat3Title: "লেখকের লেভেল বৃদ্ধি",
+        feat3Desc: "প্রতিটি পৃষ্ঠার সাথে অভিজ্ঞতা পয়েন্ট (XP) অর্জন করুন এবং সম্মান বাড়ান।",
+        feat4Title: "বিশ্বের পাঠকদের সাথে যুক্ত হন",
+        feat4Desc: "বাংলা ও ইংরেজিতে লিখে বিশ্বব্যাপী মানুষের কাছে পৌঁছে যান।",
+        feat5Title: "XP এবং লিডারবোর্ড",
+        feat5Desc: "অন্যান্য লেখকদের সাথে প্রতিযোগিতা করুন এবং সাফল্য প্রদর্শন করুন।",
+        feat6Title: "সুরক্ষিত ওয়ালেট",
+        feat6Desc: "সহজ উপায়ে BDT, USD এবং USDT ব্যালেন্স পরিচালনা করুন।",
+        titlePopular: "জনপ্রিয় গল্পসমূহ",
+        titleLatest: "নতুন প্রকাশিত গল্প",
+        titleWriters: "সেরা লেখকগণ",
+        footTagline: "লিখিত মিডিয়া শেয়ারিং, আবিষ্কার এবং ডিজিটাল আর্থিকায়নের জন্য একটি প্রিমিয়াম প্ল্যাটফর্ম।",
+        footCompany: "প্রতিষ্ঠান",
+        footCommunity: "সম্প্রদায়",
+        footAbout: "আমাদের সম্পর্কে",
+        footTerms: "শর্তাবলী ও গোপনীয়তা নীতি",
+        footExplore: "গল্প অন্বেষণ",
+        footHub: "সোশ্যাল হাব",
+        views: "ভ্যাকুয়াম",
+        likes: "পছন্দ",
+        followers: "অনুসারী",
+        read: "পড়ুন"
+      }
+    };
+
+    // Current State Management
+    let currentLang = localStorage.getItem("lang") || "EN";
+    let currentTheme = localStorage.getItem("theme") || "dark";
+
+    // Application Elements
+    const loader = document.getElementById("loader");
+    const themeBtn = document.getElementById("btn-theme");
+    const langBtn = document.getElementById("btn-lang");
+    const authButtons = document.getElementById("auth-buttons");
+
+    // Initialize View Settings
+    applyTheme(currentTheme);
+    applyLanguage(currentLang);
+    document.getElementById("current-year").textContent = new Date().getFullYear();
+
+    // Dismiss Loader
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        loader.style.opacity = "0";
+        setTimeout(() => loader.style.display = "none", 500);
+      }, 300);
+    });
+
+    // Theme Management Logic
+    themeBtn.addEventListener("click", () => {
+      currentTheme = currentTheme === "dark" ? "light" : "dark";
+      applyTheme(currentTheme);
+    });
+
+    function applyTheme(theme) {
+      if (theme === "light") {
+        document.body.classList.add("light-mode");
+        themeBtn.textContent = "☀️";
+      } else {
+        document.body.classList.remove("light-mode");
+        themeBtn.textContent = "🌙";
+      }
+      localStorage.setItem("theme", theme);
+    }
+
+    // Language Management Logic
+    langBtn.addEventListener("click", () => {
+      currentLang = currentLang === "EN" ? "BN" : "EN";
+      applyLanguage(currentLang);
+      fetchDisplayData();
+    });
+
+    function applyLanguage(lang) {
+      const data = translationData[lang];
+      
+      langBtn.textContent = lang;
+      document.getElementById("hero-title").textContent = data.heroTitle;
+      document.getElementById("hero-desc").textContent = data.heroDesc;
+      document.getElementById("btn-start-reading").textContent = data.btnStart;
+      document.getElementById("btn-become-writer").textContent = data.btnBecomeWriter;
+      
+      document.getElementById("title-features").textContent = data.txtFeatures;
+      document.getElementById("feat-1-title").textContent = data.feat1Title;
+      document.getElementById("feat-1-desc").textContent = data.feat1Desc;
+      document.getElementById("feat-2-title").textContent = data.feat2Title;
+      document.getElementById("feat-2-desc").textContent = data.feat2Desc;
+      document.getElementById("feat-3-title").textContent = data.feat3Title;
+      document.getElementById("feat-3-desc").textContent = data.feat3Desc;
+      document.getElementById("feat-4-title").textContent = data.feat4Title;
+      document.getElementById("feat-4-desc").textContent = data.feat4Desc;
+      document.getElementById("feat-5-title").textContent = data.feat5Title;
+      document.getElementById("feat-5-desc").textContent = data.feat5Desc;
+      document.getElementById("feat-6-title").textContent = data.feat6Title;
+      document.getElementById("feat-6-desc").textContent = data.feat6Desc;
+
+      document.getElementById("title-popular").textContent = data.titlePopular;
+      document.getElementById("title-latest").textContent = data.titleLatest;
+      document.getElementById("title-writers").textContent = data.titleWriters;
+
+      document.getElementById("footer-tagline").textContent = data.footTagline;
+      document.getElementById("footer-col-company").textContent = data.footCompany;
+      document.getElementById("footer-col-community").textContent = data.footCommunity;
+      document.getElementById("foot-about").textContent = data.footAbout;
+      document.getElementById("foot-terms").textContent = data.footTerms;
+      document.getElementById("foot-explore").textContent = data.footExplore;
+      document.getElementById("foot-community").textContent = data.footHub;
+
+      const loginTxt = document.getElementById("txt-login");
+      const registerTxt = document.getElementById("txt-register");
+      if (loginTxt && registerTxt) {
+        loginTxt.textContent = data.txtLogin;
+        registerTxt.textContent = data.txtRegister;
+      }
+      
+      localStorage.setItem("lang", lang);
+    }
+
+    // Monitor Auth State
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Logged-in navigation states
+        const activeLangData = translationData[currentLang];
+        authButtons.innerHTML = `
+          <a href="dashboard.html" class="btn btn-primary">${activeLangData.txtDashboard}</a>
+        `;
+      } else {
+        // Guest states
+        const activeLangData = translationData[currentLang];
+        authButtons.innerHTML = `
+          <a href="login.html" class="btn btn-secondary" id="txt-login">${activeLangData.txtLogin}</a>
+          <a href="register.html" class="btn btn-primary" id="txt-register">${activeLangData.txtRegister}</a>
+        `;
+      }
+    });
+
+    // Content Discovery and Preview Builders
+    async function fetchDisplayData() {
+      const activeLang = translationData[currentLang];
+
+      try {
+        // Query database reference points
+        const storiesRef = ref(db, 'stories');
+        const popularQuery = query(storiesRef, orderByChild('views'), limitToLast(4));
+        const latestQuery = query(storiesRef, orderByChild('createdAt'), limitToLast(4));
+        const usersRef = ref(db, 'users');
+        const writersQuery = query(usersRef, orderByChild('followers'), limitToLast(4));
+
+        const [popularSnap, latestSnap, writersSnap] = await Promise.all([
+          get(popularQuery),
+          get(latestQuery),
+          get(writersQuery)
+        ]);
+
+        renderStories(popularSnap, "popular-preview", activeLang);
+        renderStories(latestSnap, "latest-preview", activeLang, true);
+        renderWriters(writersSnap, "writers-preview", activeLang);
+
+      } catch (err) {
+        // Fallback interface logic on validation failure or default placeholder status
+        console.warn("Database response pending configurations. Using fallback presentations.", err);
+        renderPlaceholderStories("popular-preview", activeLang);
+        renderPlaceholderStories("latest-preview", activeLang);
+        renderPlaceholderWriters("writers-preview", activeLang);
+      }
+    }
+
+    function renderStories(snapshot, elementId, lang, isReverse = false) {
+      const targetElement = document.getElementById(elementId);
+      if (!snapshot.exists()) {
+        renderPlaceholderStories(elementId, lang);
+        return;
+      }
+
+      let list = [];
+      snapshot.forEach(child => {
+        if (child.val().status === 'approved') {
+          list.push({ id: child.key, ...child.val() });
+        }
+      });
+
+      if (isReverse) {
+        list.reverse();
+      }
+
+      if (list.length === 0) {
+        renderPlaceholderStories(elementId, lang);
+        return;
+      }
+
+      targetElement.innerHTML = list.map(story => `
+        <article class="story-card">
+          <div class="story-cover" style="background-image: url('${story.cover || 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=600'}');">
+            <span class="story-lang-badge">${story.language === 'Bangla' ? 'বাংলা' : 'EN'}</span>
+          </div>
+          <div class="story-info">
+            <h3 class="story-title" title="${story.title}">${story.title}</h3>
+            <p class="story-author">By ${story.authorName}</p>
+            <div class="story-meta">
+              <span>👀 ${story.views || 0} ${lang.views}</span>
+              <span>❤️ ${story.likes || 0} ${lang.likes}</span>
+            </div>
+            <a href="story.html?id=${story.id}" class="btn btn-primary" style="margin-top:0.75rem; padding: 0.4rem 1rem; font-size: 0.85rem;">
+              ${lang.read}
+            </a>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderWriters(snapshot, elementId, lang) {
+      const targetElement = document.getElementById(elementId);
+      if (!snapshot.exists()) {
+        renderPlaceholderWriters(elementId, lang);
+        return;
+      }
+
+      let list = [];
+      snapshot.forEach(child => {
+        const val = child.val();
+        if (val.role === 'writer' || val.writerActivated === true) {
+          list.push({ uid: child.key, ...val });
+        }
+      });
+
+      list.sort((a, b) => (b.followers || 0) - (a.followers || 0));
+
+      if (list.length === 0) {
+        renderPlaceholderWriters(elementId, lang);
+        return;
+      }
+
+      targetElement.innerHTML = list.map(writer => `
+        <div class="writer-card">
+          <div class="writer-avatar" style="background-image: url('${writer.profileImage || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200'}')"></div>
+          <div class="writer-details">
+            <span class="writer-name">${writer.name || writer.username}</span>
+            <span class="writer-sub">${writer.followers || 0} ${lang.followers} • Lvl ${writer.level || 1}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Default design state if Firebase Realtime Database is not populated yet
+    function renderPlaceholderStories(elementId, lang) {
+      const targetElement = document.getElementById(elementId);
+      const defaults = [
+        {
+          id: "preview-1",
+          title: "The Silent Chronicles",
+          authorName: "Tanvir Rahman",
+          cover: "https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=600",
+          language: "English",
+          views: 1420,
+          likes: 312
+        },
+        {
+          id: "preview-2",
+          title: "নিলিমার কাব্যকথা",
+          authorName: "Anika Bose",
+          cover: "https://images.unsplash.com/photo-1474932430478-367db2683dac?q=80&w=600",
+          language: "Bangla",
+          views: 2980,
+          likes: 852
+        },
+        {
+          id: "preview-3",
+          title: "Echoes of the Void",
+          authorName: "Alex Vance",
+          cover: "https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?q=80&w=600",
+          language: "English",
+          views: 954,
+          likes: 211
+        },
+        {
+          id: "preview-4",
+          title: "মায়াবী অরণ্য",
+          authorName: "Sajid Hasan",
+          cover: "https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=600",
+          language: "Bangla",
+          views: 3120,
+          likes: 910
+        }
+      ];
+
+      targetElement.innerHTML = defaults.map(story => `
+        <article class="story-card">
+          <div class="story-cover" style="background-image: url('${story.cover}');">
+            <span class="story-lang-badge">${story.language === 'Bangla' ? 'বাংলা' : 'EN'}</span>
+          </div>
+          <div class="story-info">
+            <h3 class="story-title" title="${story.title}">${story.title}</h3>
+            <p class="story-author">By ${story.authorName}</p>
+            <div class="story-meta">
+              <span>👀 ${story.views} ${lang.views}</span>
+              <span>❤️ ${story.likes} ${lang.likes}</span>
+            </div>
+            <a href="story.html?id=${story.id}" class="btn btn-primary" style="margin-top:0.75rem; padding: 0.4rem 1rem; font-size: 0.85rem;">
+              ${lang.read}
+            </a>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderPlaceholderWriters(elementId, lang) {
+      const targetElement = document.getElementById(elementId);
+      const defaults = [
+        { name: "Sajid Hasan", followers: 1205, level: 8, img: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200" },
+        { name: "Anika Bose", followers: 980, level: 6, img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200" },
+        { name: "Tanvir Rahman", followers: 852, level: 5, img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200" },
+        { name: "Rahat Kabir", followers: 730, level: 4, img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200" }
+      ];
+
+      targetElement.innerHTML = defaults.map(writer => `
+        <div class="writer-card">
+          <div class="writer-avatar" style="background-image: url('${writer.img}')"></div>
+          <div class="writer-details">
+            <span class="writer-name">${writer.name}</span>
+            <span class="writer-sub">${writer.followers} ${lang.followers} • Lvl ${writer.level}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Execute content loading
+    fetchDisplayData();
+
+  </script>
+</body>
+</html>
